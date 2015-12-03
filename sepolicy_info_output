@@ -1,0 +1,24 @@
+{
+ 'attributes': ['file_type', 'exec_type', 'entry_type', 'non_security_file_type', 'non_auth_file_type'], 
+ 'aliases': [], 
+ 'name': 'qmail_remote_exec_t', 
+ 'permissive': False}, 
+{
+ 'aliases': ['secadm_sepgsql_blob_t', 'sysadm_sepgsql_blob_t', 'auditadm_sepgsql_blob_t', 'staff_sepgsql_blob_t'],
+ 'name': 'user_sepgsql_blob_t',
+ 'permissive': False}, 
+{
+ 'attributes': ['sepgsql_table_type'],
+ 'aliases': [], 
+ 'name': 'sepgsql_fixed_table_t', 
+ 'permissive': False}, 
+{
+ 'attributes': ['port_type', 'unreserved_port_type', 'defined_port_type'], 
+ 'aliases': [], 
+ 'name': 'speech_port_t', 
+ 'permissive': False}, 
+{
+ 'aliases': ['secadm_sepgsql_blob_t', 'sysadm_sepgsql_blob_t', 'auditadm_sepgsql_blob_t', 'staff_sepgsql_blob_t'],
+ 'name': 'user_sepgsql_blob_t', 
+ 'permissive': False}, 
+{'attributes': ['file_type', 'non_security_file_type', 'non_auth_file_type', 'logfile'], 'aliases': [], 'name': 'zebra_log_t', 'permissive': False}, {'attributes': ['file_type', 'non_security_file_type', 'non_auth_file_type', 'configfile'], 'aliases': [], 'name': 'NetworkManager_etc_rw_t', 'permissive': False}, {'aliases': ['aisexec_tmpfs_t', 'corosync_tmpfs_t', 'pacemaker_tmpfs_t', 'rgmanager_tmpfs_t'], 'name': 'cluster_tmpfs_t', 'permissive': False}, {'attributes': ['file_type', 'exec_type', 'entry_type', 'non_security_file_type', 'direct_init_entry', 'non_auth_file_type'], 'aliases': [], 'name': 'cgclear_exec_t', 'permissive': False}, {'attributes': ['systemprocess', 'corenet_unlabeled_type', 'userdom_home_manager_type', 'daemon', 'application_domain_type', 'system_bus_type', 'domain'], 'aliases': [], 'name': 'gconfdefaultsm_t', 'permissive': False}, {'attributes': ['port_type', 'unreserved_port_type', 'defined_port_type'], 'aliases': [], 'name': 'gear_port_t', 'permissive': False}, {'attributes': ['filesystem_type', 'mlstrustedobject', 'boolean_type'], 'aliases': [], 'name': 'httpd_bool_t', 'permissive': False}, {'attributes': ['file_type', 'exec_type', 'entry_type', 'non_security_file_type', 'direct_init_entry', 'non_auth_file_type'], 'aliases': [], 'name': 'ipa_otpd_exec_t', 'permissive': False}, {'attributes': ['packet_type', 'server_packet_type'], 'aliases': [], 'name': 'lsm_plugin_server_packet_t', 'permissive': False}, {'aliases': ['sftpd_anon_t'], 'name': 'anon_sftpd_t', 'permissive': False}, {'aliases': ['munin_disk_plugin_exec_t'], 'name': 'disk_munin_plugin_exec_t', 'permissive': False}, {'attributes': ['file_type', 'non_security_file_type', 'non_auth_file_type', 'pidfile'], 'aliases': [], 'name': 'mysqlmanagerd_var_run_t', 'permissive': False}, {'attributes': ['file_type', 'exec_type', 'entry_type', 'non_security_file_type', 'direct_init_entry', 'pki_apache_executable', 'non_auth_file_type'], 'aliases': [], 'name': 'pki_tps_exec_t', 'permissive': False}, {'attributes': ['file_type', 'non_security_file_type', 'non_auth_file_type', 'lockfile'], 'aliases': [], 'name': 'pki_tps_lock_t', 'permissive': False},
