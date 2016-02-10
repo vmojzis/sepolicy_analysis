@@ -30,11 +30,15 @@ def get_cmap(N):
 
 G = nx.DiGraph()
 
-me = 'init_t'
+#me = 'init_t'
 #me = 'mozilla_plugin_t'
+me = 'rdisc_t'
+#me = 'sshd_t'
 # ?all? allow rules #print sepolicy.search(['allow']) rules =
-rules_out = sepolicy.search([sepolicy.ALLOW], {'source': me, 'permlist': ['write'], 'class': 'file'}) 
-rules_in = sepolicy.search([sepolicy.ALLOW], {'target': me, 'permlist': ['write'], 'class': 'file'}) 
+#rules_out = sepolicy.search([sepolicy.ALLOW], {'source': me, 'permlist': ['write'], 'class': 'file'}) 
+#rules_in = sepolicy.search([sepolicy.ALLOW], {'target': me, 'permlist': ['write'], 'class': 'file'}) 
+rules_out = sepolicy.search([sepolicy.ALLOW], {'source': me, 'class': 'file'}) 
+rules_in = []
 
 my_attributes = sepolicy.info(sepolicy.TYPE, me)[0]["attributes"]
 
@@ -211,7 +215,7 @@ nx.draw_networkx_nodes(G, pos, nodelist = edges_legend, node_color = edge_colors
 
 
 
-plt.savefig("path.png", format='png', dpi=100)
+plt.savefig("path.eps", format='eps', dpi=300)
 #plt.show()
 #nx.draw_graphviz(G)
 #nx.write_dot(G,'file.dot')
