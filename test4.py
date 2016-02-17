@@ -101,10 +101,11 @@ def group_types_name():
 
 	# TODO - better attribute filtering
 	# filter out attribute names and remove trailing "_t"
-	type_list = set([x[:-2].lower() for x in type_list])
+	type_list = set([x[:-2].lower() for x in type_list if x[-2:] == "_t"])
 	
 	#get types corresponding to "domains" - runnables
-	subject_list = set([x[:-2].lower() for x in data.get_domain_types()])
+	subject_list = sepolicy.info(sepolicy.ATTRIBUTE, "domain")[0]['types']
+	subject_list = set([x[:-2].lower() for x in subject_list if x[-2:] == "_t"])
 
 	object_list = sorted(type_list - subject_list)#, key=lambda s: s.lower())
 	type_list = sorted(type_list)#, key=lambda s: s.lower())

@@ -14,7 +14,10 @@ import matplotlib.cm as cmx
 import matplotlib.colors as colors
 from collections import defaultdict
 from edge_labels_optimizer import process_edge_labels, print_permission_sets
+import policy_data_collection as data
+import config_loading as config
 import math
+
 
 # map the integer indices 0, 1, ... N-1 to distinct RGB colors
 def get_cmap(N):
@@ -28,200 +31,198 @@ def get_cmap(N):
 
 
 
-G = nx.DiGraph()
 
-#me = 'init_t'
-#me = 'mozilla_plugin_t'
-me = 'rdisc_t'
-#me = 'sshd_t'
-# ?all? allow rules #print sepolicy.search(['allow']) rules =
-#rules_out = sepolicy.search([sepolicy.ALLOW], {'source': me, 'permlist': ['write'], 'class': 'file'}) 
-#rules_in = sepolicy.search([sepolicy.ALLOW], {'target': me, 'permlist': ['write'], 'class': 'file'}) 
-rules_out = sepolicy.search([sepolicy.ALLOW], {'source': me, 'class': 'file'}) 
-rules_in = []
+def foo_():
+	#me = 'init_t'
+	#me = 'mozilla_plugin_t'
+	me = 'rdisc_t'
+	#me = 'sshd_t'
+	# ?all? allow rules #print sepolicy.search(['allow']) rules =
+	#rules_out = sepolicy.search([sepolicy.ALLOW], {'source': me, 'permlist': ['write'], 'class': 'file'}) 
+	#rules_in = sepolicy.search([sepolicy.ALLOW], {'target': me, 'class': 'file'}) 
+	rules_out = sepolicy.search([sepolicy.ALLOW], {'source': me, 'class': 'file'}) 
+	rules_in = []
 
-my_attributes = sepolicy.info(sepolicy.TYPE, me)[0]["attributes"]
+	my_attributes = sepolicy.info(sepolicy.TYPE, me)[0]["attributes"]
 
-print("Attributes>")
-print(my_attributes)
-print("\n\n\n")
-#print rules #all types #sepolicy.info(0) #print
-#sepolicy.info(sepolicy.TYPE)
-#print my_attributes
+	targets = [me]
 
-targets = [me]
-
-for i in rules_out:
-	if i['target'] not in targets:
-		targets.append(i['target'])
-
-print(targets)
-
-
-# Add edges to output graph
-# Attributes of source type have to be considered as exceptions 
-# rules such as "attribute -> type" have to be converted to "source_type -> type"
-edges = []
-edge_labels = defaultdict(list)
-
-# dictionary containing sets of edges corresponding to each attribute
-# attribute_edges['attribute'] = [edges_corresponding_to_attribute]
-attribute_edges = {}
-#for attr in my_attributes:
-#	attribute_edges[attr] = []
-
-for i in rules_in:
-	target = i['target']
-	if target in my_attributes:
-		target = me
-		if(i['target'] in attribute_edges):
-			attribute_edges[i['target']].append((i['source'], target))
-		else:
-			attribute_edges[i['target']] = [(i['source'], target)]
-	#else:
-	#	attribute_edges['other'].append((i['source'], target))
+	for i in rules_out:
+		if i['target'] not in targets:
+			targets.append(i['target'])
 	
-	edges.append((i['source'], target))
-	#if (i['source'], target) in edge_labels:
-  	#	edge_labels[(i['source'], target)] += ", " + i['class']
-	#else:
-  	#	edge_labels[(i['source'], target)] = i['class']
+	print(targets)
+
+
+	# Add edges to output graph
+	# Attributes of source type have to be considered as exceptions 
+	# rules such as "attribute -> type" have to be converted to "source_type -> type"
+	#edges = []
+	edge_labels = defaultdict(list)
+
+	# dictionary containing sets of edges corresponding to each attribute
+	# attribute_edges['attribute'] = [edges_corresponding_to_attribute]
+	attribute_edges = {}
+	#for attr in my_attributes:
+	#	attribute_edges[attr] = []
+
+	for i in rules_in:
+		if i['source'] == me:
+			continue # skip loops (edge form vertex to itself)
+		target = i['target']
+		if target in my_attributes:
+			target = me
+			if(i['target'] in attribute_edges):
+				attribute_edges[i['target']].append((i['source'], target))
+			else:
+				attribute_edges[i['target']] = [(i['source'], target)]
+
+		edge_labels[(i['source'], target)].extend(i['permlist'])
+
+	for i in rules_out:
+		if i['target'] == me:
+			continue # skip loops (edge form vertex to itself)
+		source = i['source']
+		if source in my_attributes:
+			source = me
+			if(i['source'] in attribute_edges):
+				attribute_edges[i['source']].append((source, i['target']))
+			else:
+				attribute_edges[i['source']] = [(source, i['target'])]
+		
+		edge_labels[(source, i['target'])].extend(i['permlist'])
+
+	process_edge_labels(edge_labels)
+
+	make_graph(edge_labels, attribute_edges, me)
+
+def foo():
+	me = 'rdisc_t'
+
+	rules = data.get_type_enf_rules(_ruletype = ["allow"], _source = me, _tclass = ['file'])
+	rules = data.filter_terules_boolean(rules, config.get_boolean_config())
+	edge_labels = defaultdict(list)
+
+	my_attributes = data.get_attributes_of(me)
+	# dictionary containing sets of edges corresponding to each attribute
+	# attribute_edges['attribute'] = [edges_corresponding_to_attribute]
+	attribute_edges = {}
+	#for attr in my_attributes:
+	#	attribute_edges[attr] = []
+	#print rules
+	dotted_edges = set()
+
+	for i in rules:
+		target_type = i.target
+		if str(target_type) == me:
+			continue # skip loops (edge form vertex to itself)
+		source = str(i.source)
+		if source in my_attributes:
+			source = me
+			if(str(i.source) in attribute_edges):
+				attribute_edges[str(i.source)].append((source, str(i.target)))
+			else:
+				attribute_edges[str(i.source)] = [(source, str(i.target))]
+		
+		edge_labels[(source, str(i.target))].extend([str(x) for x in i.perms])
+
+		if data.is_conditional(i):
+			dotted_edges.add((source, str(i.target)))
+
+	process_edge_labels(edge_labels)
+
 	
-	edge_labels[(i['source'], target)].extend(i['permlist'])
+	make_graph(edge_labels, attribute_edges, dotted_edges, me)
 
-for i in rules_out:
-	source = i['source']
-	if source in my_attributes:
-		source = me
-		if(i['source'] in attribute_edges):
-			attribute_edges[i['source']].append((source, i['target']))
-		else:
-			attribute_edges[i['source']] = [(source, i['target'])]
+def visualise_rules(main_node, rules):
 
-	#else:
-	#	attribute_edges['other'].append((source, i['target']))
+	make_graph(edge_labels, attribute_edges, me)
+
+# edges -> dictionary {(pair_of_nodes):label}
+# colored_edges -> dictionary {group_name:[group_edges]}
+def make_graph(edges, colored_edges, dotted_edges, me):
+	G = nx.DiGraph()
+	for (x,y) in edges.keys():
+		print x + " - " + y
+
+	G.add_edges_from(edges.keys()) # nodes are added with keys - no unconnected edges
+
+	# generate circular layout using graph without main node (which will be in the center)
+	G2 = nx.DiGraph()
+	G2.add_nodes_from(G.node)
+	G2.remove_node(me)
+	pos=nx.circular_layout(G2)
+	del(G2)
 	
-	edges.append((source, i['target']))
+	pos[me] = [0,0]
 
-	#if (source, i['target']) in edge_labels:
-  	#	edge_labels[(source, i['target'])] += ", " + i['class']
-	#else:
-  	#	edge_labels[(source, i['target'])] = i['class']
-	
-	edge_labels[(source, i['target'])].extend(i['permlist'])
+	#######################
+	# customized graph drawing
 
-print(edge_labels)
-print("\n\n")
-process_edge_labels(edge_labels)
-print(edge_labels)
-#print("\n\n")
-#print(edges)
+	# set canvas size
+	figsize = len(edges) #if len(edges) > 20 else 20
+	plt.figure(figsize=(figsize,figsize/2))
 
-#get all entrypoints
-#sepolicy.info(sepolicy.ATTRIBUTE, "entry_type")
+	nx.draw_networkx_nodes(G,pos,
+	                       node_color='w',
+	                   	   alpha=1)
+	# edges
 
-#for domain_type in self.ptypes:
-#            self.attributes[domain_type] = sepolicy.info(sepolicy.TYPE, ("%s") % domain_type)[0]["attributes"]
+	# colored edges
+	colormap = get_cmap(len(colored_edges.keys()))
+	colorcount = 0
+	edge_colors = []
+	# edge colors -- corresponding to each attribute
 
+	for key in colored_edges.keys():
+		col = colormap(colorcount)
+		edge_colors.append(col)
+		colorcount += 1
+		nx.draw_networkx_edges(G,pos, colored_edges[key],
+	                       width=3,alpha=0.5,edge_color=colors.rgb2hex(col))
 
-#G.add_nodes_from(targets)
-G.add_edges_from(edges)
+	solid_edges = set(G.edges())-dotted_edges
+	#print solid_edges
+	nx.draw_networkx_edges(G,pos,solid_edges,width=1.0,alpha=1)
+	nx.draw_networkx_edges(G,pos,dotted_edges, style = "dashed",width=1.0,alpha=1)
 
-#print G
-#nx.draw(G)
-#nx.draw_random(G)
-pos=nx.circular_layout(G)
+	nx.draw_networkx_edge_labels(G,pos, edge_labels = edges, clip_on = True, label_pos=0.5, font_size=13)
+	pos2 = {}
+	for vector in G.node:
+		pos2[vector] = [pos[vector][0], pos[vector][1]+ 2.0/figsize]
 
-pos[me] = [0,0]
-# draw complete graph
-#nx.draw_circular(G,arrows=True, with_labels=True, node_color='r',
-#                       node_size=500,
-#                   alpha=0.8)
+	nx.draw_networkx_labels(G,pos2,font_size=16)
 
+	#add legend for attributes - each attribute gets a node
+	#------------------------------
+	edges_legend = [x.upper() for x in colored_edges.keys()]
 
-#######################
-# customized graph drawing
-figsize = len(edges) #if len(edges) > 20 else 20
-figsize= figsize 
-#figsize = len(edges) if len(edges) > 20 else 20
-plt.figure(figsize=(figsize,figsize/2))
+	G.add_nodes_from(edges_legend)
 
-nx.draw_networkx_nodes(G,pos,
-#                       nodelist=[0,1,2,3],
-                       node_color='w',
-                       #node_size=500,
-                   alpha=1)
-#nx.draw_networkx_nodes(G,pos,
-#                       node_color='b',
-#                       node_size=500,
-#                   alpha=0.8)
+	#2.5 in graph coordinates is width of the whole graph
+	_delta = 2.4/(len(edges_legend)-1)
+	x_pos = -1.2
+	for attr in edges_legend:
+		pos2[attr.upper()] = [x_pos,-1.3+2.0/figsize]
+		pos[attr.upper()] = [x_pos,-1.3]
+		x_pos += _delta
 
-# edges
-nx.draw_networkx_edges(G,pos,width=1.0,alpha=0.5)
+	#permission sets legend
+	print "\n\n\n"
+	print_permission_sets()
 
-colormap = get_cmap(len(attribute_edges.keys()))
-colorcount = 0
-edge_colors = []
-# edge colors -- corresponding to each attribute
-
-for key in attribute_edges.keys():
-	col = colormap(colorcount)
-	edge_colors.append(col)
-	colorcount += 1
-	print (col)
-	nx.draw_networkx_edges(G,pos, attribute_edges[key],
-                       width=2,alpha=0.5,edge_color=colors.rgb2hex(col))
-
-#nx.draw_networkx_edges(G,pos,
-#                       edgelist=[(0,1),(1,2),(2,3),(3,0)],
-#                       width=8,alpha=0.5,edge_color='r')
+	nx.draw_networkx_labels(G, pos2, nodelist = edges_legend, font_size=16)
+	nx.draw_networkx_nodes(G, pos, nodelist = edges_legend, node_color = edge_colors)
+	#------------------------------
 
 
+	plt.savefig("path.pdf", format='pdf', dpi=500)
+	#plt.show()
+	#nx.draw_graphviz(G)
+	#nx.write_dot(G,'file.dot')
 
-
-# some math labels
-#labels={}
-#labels[0]=r'$a$'
-
-nx.draw_networkx_edge_labels(G,pos, edge_labels = edge_labels, clip_on = True, label_pos=0.5, font_size=13)
-pos2 = {}
-for vector in G.node:
-	pos2[vector] = [pos[vector][0], pos[vector][1]+ 2.0/figsize]
-
-nx.draw_networkx_labels(G,pos2,font_size=16)
-
-#add legend for attributes - each attribute gets a node
-#------------------------------
-edges_legend = [x.upper() for x in attribute_edges.keys()]
-
-G.add_nodes_from(edges_legend)
-
-#2.5 corresponds to graph coordinates - width of whole graph
-_delta = 2.4/(len(edges_legend)-1)
-x_pos = -1.2
-for attr in edges_legend:
-	pos2[attr.upper()] = [x_pos,-1.3+2.0/figsize]
-	pos[attr.upper()] = [x_pos,-1.3]
-	x_pos += _delta
-
-print "\n\n\n"
-print_permission_sets()
-
-
-nx.draw_networkx_labels(G, pos2, nodelist = edges_legend, font_size=16)
-nx.draw_networkx_nodes(G, pos, nodelist = edges_legend, node_color = edge_colors)
-#------------------------------
-
-
-
-
-plt.savefig("path.eps", format='eps', dpi=300)
-#plt.show()
-#nx.draw_graphviz(G)
-#nx.write_dot(G,'file.dot')
-
-#export grahp to "trolo"
-#nx.write_graphml(G, "trolo")
+	#export grahp to "trolo"
+	#nx.write_graphml(G, "trolo")
 
 
 
