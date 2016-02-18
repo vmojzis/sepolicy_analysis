@@ -1,0 +1,25 @@
+
+(C) Copyright 2016 Vit Mojzis, vmojzis@redhat.com
+
+This program is distributed under the terms of the GNU Lesser General Public License
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+Installation:
+	You need to have SETools v4 package (locally) installed including all dependencies.
+		- https://github.com/TresysTechnology/setools
+	SETools v4 should be inside this project folder under "setools_v4" 
+		- otherwise edit the inlude statement in "policy_data_collection.py"
+	As of yet, the project is far form finished and most of the functionality is not interconnected
+		- "test_setools.py" contains example uses of implemented functionality

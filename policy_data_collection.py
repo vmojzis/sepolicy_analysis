@@ -8,11 +8,6 @@ cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(insp
 if cmd_subfolder not in sys.path:
     sys.path.insert(0, cmd_subfolder)
 
-#cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"setools_v4/setools/policyrep")))
-#if cmd_subfolder not in sys.path:
-#    sys.path.insert(0, cmd_subfolder)
- 
-#import exception
 import setools
 #import setools.policyrep
 

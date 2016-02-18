@@ -10,11 +10,11 @@ def get_boolean_config():
 		txt = open("bool_config", "r")
 		config = {}
 		for line in txt:
-			split_line = line.split(" ")
+			split_line = line.rstrip().split(" ")
 			if len(split_line) != 3:
 				print("Invalid line: " + split_line, file=sys.stderr)
 				break 
-			config[split_line[0]] = (split_line[2] == "on\n")
+			config[split_line[0]] = (split_line[2] == "on")
 			print(" ".join(split_line))
 		return config
 
