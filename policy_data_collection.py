@@ -67,8 +67,8 @@ def get_attributes_of(type_name):
 # ruletype -> list containing [allow, auditallow, dontaudit, type_transition, type_change, type_member]+
 # source -> source type/attribute
 # source_indirect -> "-ds" parameter of sesearch
-# tclass -> list of target classes
-# perms -> list of permissions
+# tclass -> list of target classes (rules containing at least one of the classes)
+# perms -> list of permissions (rules containing at least one of the permissions)
 # booleans -> list of booleans
 # returns generator for TERule objects
 def get_type_enf_rules(_ruletype = ["allow"],
@@ -130,6 +130,7 @@ def get_booleans():
 		bools[str(boolean)] = selinux.security_get_boolean_active(str(boolean)) == 1
 	return bools
 
+# is given type enforcement rule conditional?
 def is_conditional(rule):
 	try:
 		boolean = str(rule.conditional)
@@ -137,6 +138,7 @@ def is_conditional(rule):
 
 	except setools.policyrep.exception.RuleNotConditional:
 		False
+
 	
 #print "Attribute count: " + str(len(get_all_attributes()))
 #print "Type count: " + str(sum(1 for _ in setools.SELinuxPolicy().types()))

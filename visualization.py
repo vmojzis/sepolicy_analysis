@@ -1,5 +1,7 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
+from __future__ import print_function
 #egg_path='/home/vmojzis/DEVEL/selinux-policy/sepolicy_analysis/networkx-1.10-py3.4.egg'
 
 #sys.path.append(egg_path)
@@ -109,7 +111,9 @@ def foo():
 	attribute_edges = {}
 	#for attr in my_attributes:
 	#	attribute_edges[attr] = []
-	#print rules
+
+	filtered_attributes = set(['domain', 'daemon'])
+
 	dotted_edges = set()
 
 	for i in rules:
@@ -117,14 +121,20 @@ def foo():
 		if str(target_type) == me:
 			continue # skip loops (edge form vertex to itself)
 		source = str(i.source)
+
+		#skip filtered attributes
+		if source in filtered_attributes:
+			continue
+
 		if source in my_attributes:
 			source = me
 			if(str(i.source) in attribute_edges):
 				attribute_edges[str(i.source)].append((source, str(i.target)))
 			else:
 				attribute_edges[str(i.source)] = [(source, str(i.target))]
-		
+
 		edge_labels[(source, str(i.target))].extend([str(x) for x in i.perms])
+
 
 		if data.is_conditional(i):
 			dotted_edges.add((source, str(i.target)))
@@ -134,16 +144,78 @@ def foo():
 	
 	make_graph(edge_labels, attribute_edges, dotted_edges, me)
 
-def visualise_rules(main_node, rules):
 
-	make_graph(edge_labels, attribute_edges, me)
+# query - class containing query arguments 
+#TODO - specify the query and write command line argument reading
+def apply_query(query):
+	rules = data.get_type_enf_rules(_ruletype = ["allow"], _source = query['main_domain'], _tclass = ['file'])
+	rules = data.filter_terules_boolean(rules, config.get_boolean_config())
 
+
+	filtered_attributes = set(['domain', 'daemon'])
+	#filtering
+	for rule in rules:
+		source = str(rule.source)
+
+		#skip filtered attributes
+		#if source in filtered_attributes:
+		#	continue
+
+	visualise_rules(query['main_domain'], True, rules)
+
+
+#main_domain - string (source/destination of given rules)
+#is_source - True if main_domain (and it's attributes) is source of given rules
+#rules - list of [TERule]
+def visualise_rules(main_domain, is_source, rules):
+	
+	my_attributes = data.get_attributes_of(main_domain)
+	# dictionary containing sets of edges corresponding to each attribute
+	# attribute_edges['attribute'] = [edges_corresponding_to_attribute]
+	attribute_edges = {}
+
+	#edges corresponding to boolean-conditioned rules
+	conditional_edges = set() 
+
+	edge_labels = defaultdict(list)
+
+	#TODO skip loops (edge form vertex to itself)
+	for i in rules:
+		source = str(i.source)
+		target = str(i.target)
+
+		if is_source:
+			#change source to "main_domain" if it is an attribute
+			if source in my_attributes:
+				if(source in attribute_edges):
+					attribute_edges[source].append((main_domain, target))
+				else:
+					attribute_edges[source] = [(main_domain, target)]
+				source = main_domain
+		else:
+			#change target to "main_domain" if it is an attribute
+			if target in my_attributes:
+				if(target in attribute_edges):
+					attribute_edges[target].append((source, main_domain))
+				else:
+					attribute_edges[target] = [(source, main_domain)]
+				target = main_domain
+
+		edge_labels[(source, target)].extend([str(x) for x in i.perms])
+
+		if data.is_conditional(i):
+			conditional_edges.add((source, target))
+
+	process_edge_labels(edge_labels)
+
+	
+	make_graph(edge_labels, attribute_edges, conditional_edges, main_domain)
 # edges -> dictionary {(pair_of_nodes):label}
 # colored_edges -> dictionary {group_name:[group_edges]}
 def make_graph(edges, colored_edges, dotted_edges, me):
 	G = nx.DiGraph()
 	for (x,y) in edges.keys():
-		print x + " - " + y
+		print(x + " - " + y)
 
 	G.add_edges_from(edges.keys()) # nodes are added with keys - no unconnected edges
 
@@ -160,7 +232,7 @@ def make_graph(edges, colored_edges, dotted_edges, me):
 	# customized graph drawing
 
 	# set canvas size
-	figsize = len(edges) #if len(edges) > 20 else 20
+	figsize = len(edges) if len(edges) > 20 else 20
 	plt.figure(figsize=(figsize,figsize/2))
 
 	nx.draw_networkx_nodes(G,pos,
@@ -182,7 +254,7 @@ def make_graph(edges, colored_edges, dotted_edges, me):
 	                       width=3,alpha=0.5,edge_color=colors.rgb2hex(col))
 
 	solid_edges = set(G.edges())-dotted_edges
-	#print solid_edges
+	
 	nx.draw_networkx_edges(G,pos,solid_edges,width=1.0,alpha=1)
 	nx.draw_networkx_edges(G,pos,dotted_edges, style = "dashed",width=1.0,alpha=1)
 
@@ -200,15 +272,19 @@ def make_graph(edges, colored_edges, dotted_edges, me):
 	G.add_nodes_from(edges_legend)
 
 	#2.5 in graph coordinates is width of the whole graph
-	_delta = 2.4/(len(edges_legend)-1)
-	x_pos = -1.2
+	if len(edges_legend) < 2:
+		x_pos = 0
+		_delta = 0
+	else:
+		_delta = 2.4/(len(edges_legend)-1)
+		x_pos = -1.2
 	for attr in edges_legend:
 		pos2[attr.upper()] = [x_pos,-1.3+2.0/figsize]
 		pos[attr.upper()] = [x_pos,-1.3]
 		x_pos += _delta
 
 	#permission sets legend
-	print "\n\n\n"
+	print("\n\n\n")
 	print_permission_sets()
 
 	nx.draw_networkx_labels(G, pos2, nodelist = edges_legend, font_size=16)

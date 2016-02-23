@@ -27,7 +27,7 @@ perm_sets = [
 
 
 def print_permission_sets():
-	print "Capitalised words in edge labels are permission sets containing the following permissions:"
+	print "Capitalised words in edge labels are permission sets containing the following permissions:\n"
 	for label, perm_list in perm_sets:
 		print label + ": " + ", ".join(perm_list)
 
