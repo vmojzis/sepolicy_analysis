@@ -162,7 +162,10 @@ def get_booleans():
 # is given type enforcement rule conditional?
 def is_conditional(rule):
 	try:
-		boolean = str(rule.conditional)
+		if type(rule) == setools.policyrep.terule.ExpandedAVRule:
+			boolean = str(rule.origin.conditional)
+		else:
+			boolean = str(rule.conditional)
 		return boolean
 
 	except setools.policyrep.exception.RuleNotConditional:

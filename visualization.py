@@ -176,24 +176,8 @@ def apply_query(query):
 				continue
 			filtered_rules.append(rule)
 
-	# expand rules ending in attribute
 	'''
-	rules = []
-	other_side = "source" if main_domain == "target" else "target"
-	attributes = data.get_attributes
-	for rule in filtered_rules:
-		if data.is_attribute(getattr(rule, other_side)):
-			for t in getattr(rule, other_side).expand():
-				#print("TYPES>>>>", [str(x) for x in getattr(rule, other_side).expand()])
-				new_rule = copy.deepcopy(rule)
-				print("NEW_RULE>> ", new_rule)
-				#setattr(new_rule, other_side, t) 
-				new_rule.target = t
-				rules.append(new_rule)
-		else:
-			rules.append(rule)
-'''
-
+	# expand rules ending in attribute
 	rules = []
 	other_side = "source" if main_domain == "target" else "target"
 	attributes = data.get_attributes
@@ -202,11 +186,11 @@ def apply_query(query):
 			rules.extend(data.half_expand_rule(rule, main_domain == "target"))
 		else:
 			rules.append(rule)
+	'''
+	rules = filtered_rules	
 
-	
 
-
-	visualise_rules(getattr(query, main_domain), True, rules)
+	visualise_rules(getattr(query, main_domain), main_domain == "source", rules)
 
 
 #main_domain - string (source/destination of given rules)
@@ -284,8 +268,13 @@ def make_graph(edges, colored_edges, dotted_edges, me):
 	# customized graph drawing
 
 	# set canvas size
-	figsize = len(edges) if len(edges) > 20 else 20
+	figsize = len(edges) if len(edges) > 30 else 30
+	if figsize > 400:
+		figsize = 400
+		print("\nMaximum canvas size exceeded, the graph may not scale properly!\n")
+
 	plt.figure(figsize=(figsize,figsize/2))
+	
 
 	nx.draw_networkx_nodes(G,pos,
 	                       node_color='w',
@@ -297,7 +286,6 @@ def make_graph(edges, colored_edges, dotted_edges, me):
 	colorcount = 0
 	edge_colors = []
 	# edge colors -- corresponding to each attribute
-
 	for key in colored_edges.keys():
 		col = colormap(colorcount)
 		edge_colors.append(col)
@@ -336,7 +324,7 @@ def make_graph(edges, colored_edges, dotted_edges, me):
 		x_pos += _delta
 
 	#permission sets legend
-	print("\n\n\n")
+	#print("\n\n\n")
 	print_permission_sets()
 
 	nx.draw_networkx_labels(G, pos2, nodelist = edges_legend, font_size=16)

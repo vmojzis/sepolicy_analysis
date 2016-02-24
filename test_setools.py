@@ -3,6 +3,7 @@ import policy_data_collection as data
 import sys
 import visualization as vis
 import config_loading as config
+import edge_labels_optimizer as elo
 
 #print data.get_attributes_of("init_t")
 #print "\n".join(sorted([str(x) for x in data.get_type_enf_rules(["allow"], "mozilla_plugin_t")]))
@@ -26,4 +27,5 @@ import config_loading as config
 #vis.foo()
 #vis.apply_query({'main_domain':'rdisc_t'})
 #data.get_types_of()
-print type(data.get_attributes_of_("init_t")[0])
+#print type(data.get_attributes_of_("init_t")[0])
+print(elo.perm_sets_hierarchy())
