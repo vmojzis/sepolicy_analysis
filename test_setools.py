@@ -23,5 +23,7 @@ import config_loading as config
 #print "\n".join([str(x) for x in data.filter_terules_boolean(data.get_type_enf_rules(["allow"], "mozilla_plugin_t", _tclass = ["shm"]), config.get_boolean_config())])
 
 #visualization (visualization.py) - output in "path.pdf"
-vis.foo()
+#vis.foo()
 #vis.apply_query({'main_domain':'rdisc_t'})
+#data.get_types_of()
+print type(data.get_attributes_of_("init_t")[0])

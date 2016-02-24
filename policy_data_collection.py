@@ -17,6 +17,18 @@ def expand_attr(attr):
     contents = items if items else "<empty attribute>"
     return "{0}\n\t{1}".format(attr.statement(), contents)
 
+# half of BaseTERule.expand() method (expand only one side)
+# expand_source - True means we want to expand source (target otherwise)
+def half_expand_rule(rule, expand_source):
+	results = []
+	expansion = rule.source.expand() if expand_source else rule.target.expand()
+	if expand_source:
+		for t in expansion:
+			results.append(setools.policyrep.terule.expanded_te_rule_factory(rule, t, rule.target))
+	else:
+		for t in expansion:
+			results.append(setools.policyrep.terule.expanded_te_rule_factory(rule, rule.source, t))
+	return results
 
 #print type(list(results)[0])
 #for item in results:
@@ -47,9 +59,9 @@ def get_types():
 def get_domain_types():
 	q = setools.TypeAttributeQuery(setools.SELinuxPolicy())
 	q.name = "domain"
-	results = [x for x in q.results()] #should contain only 1 item - TypeAttribute("domain")
+	results = q.results().next() #should contain only 1 item - TypeAttribute("domain")
 	if results:
-		return [str(x) for x in results[0].expand()]
+		return [str(x) for x in results.expand()]
 	else :
 		return []
 	
@@ -62,6 +74,21 @@ def get_attributes_of(type_name):
 		# return attributes of all types corresponding to given name
 		results.extend([str(x) for x in item.attributes()]) 
 	return results
+
+
+# returns types that have given attribute (specified by name)
+def get_types_of_str(attr_name):
+	q = setools.TypeAttributeQuery(setools.SELinuxPolicy())
+	q.name = attr_name
+	results = q.results().next() #should contain only 1 item - TypeAttribute("domain")
+	if results:
+		return [str(x) for x in results.expand()]
+	else :
+		return []
+
+# returns types that have given attribute
+def get_types_of_str(attr):
+	return [str(x) for x in attr.expand()]
 
 # Get type enforcement rules (same behaviour as sesearch) 
 # ruletype -> list containing [allow, auditallow, dontaudit, type_transition, type_change, type_member]+
@@ -112,6 +139,8 @@ def filter_terules_boolean(rules, bool_state = None):
 			if rule.conditional_block == state:
 				# return rules in agreement with boolean settings
 				results.append(rule)
+			#else:
+			#	print("Rule removed")
 
 		except setools.policyrep.exception.RuleNotConditional:
 			# return all unconditional rules
@@ -134,12 +163,62 @@ def get_booleans():
 def is_conditional(rule):
 	try:
 		boolean = str(rule.conditional)
-		return True
+		return boolean
 
 	except setools.policyrep.exception.RuleNotConditional:
 		False
 
-	
+# is given object of type "TypeAttribute"
+def is_attribute(obj):
+	return (type(obj) == setools.policyrep.typeattr.TypeAttribute)
+
+
+# query - argparser output
+#TODO - specify the query and write command line argument reading
+def apply_query(query):
+					   
+	rules = data.get_type_enf_rules(_ruletype = ["allow"],
+								    _source = query.source,
+								    _target = query.target, 
+								    _tclass = query.tclass,
+									_perms = query.perms,
+									_booleans = query.boolean
+								    )
+
+	# filtering
+
+	if query.filter_bools != None:
+		rules = data.filter_terules_boolean(rules, query.filter_bools)
+
+	#attribute containing "main domain"
+	main_domain = "source" if query.source else "target"
+
+	# filter attribute rules
+	filtered_rules = []
+	if query.filter_attrs:
+		for rule in rules:
+			attr = str(getattr(rule, main_domain))
+
+			#skip filtered attributes
+			if attr in query.filter_attrs:
+				continue
+			filtered_rules.append(rule)
+
+	# expand rules ending in attribute
+	rules = []
+	other_side = "source" if main_domain == "target" else "target"
+	attributes = data.get_attributes
+	for rule in filtered_rules:
+		if data.is_attribute(getattr(rule, other_side)):
+			for t in getattr(rule, other_side).expand():
+				new_rule = copy.deepcopy(rule) 
+				setattr(new_rule, other_side, t) 
+				rules.append(new_rule)
+		else:
+			rules.append(rule)
+	return rules
+
+
 #print "Attribute count: " + str(len(get_all_attributes()))
 #print "Type count: " + str(sum(1 for _ in setools.SELinuxPolicy().types()))
 #print get_types()

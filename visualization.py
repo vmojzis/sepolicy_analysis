@@ -11,15 +11,16 @@ import matplotlib.pyplot as plt
 import selinux
 import sepolicy   
 import random
+import copy
 import matplotlib.pyplot as plt
 import matplotlib.cm as cmx
 import matplotlib.colors as colors
 from collections import defaultdict
 from edge_labels_optimizer import process_edge_labels, print_permission_sets
+
 import policy_data_collection as data
 import config_loading as config
 import math
-
 
 # map the integer indices 0, 1, ... N-1 to distinct RGB colors
 def get_cmap(N):
@@ -30,7 +31,6 @@ def get_cmap(N):
     def map_index_to_rgb_color(index):
         return scalar_map.to_rgba(index)
     return map_index_to_rgb_color
-
 
 
 
@@ -145,23 +145,68 @@ def foo():
 	make_graph(edge_labels, attribute_edges, dotted_edges, me)
 
 
-# query - class containing query arguments 
+# query - argparser output
 #TODO - specify the query and write command line argument reading
 def apply_query(query):
-	rules = data.get_type_enf_rules(_ruletype = ["allow"], _source = query['main_domain'], _tclass = ['file'])
-	rules = data.filter_terules_boolean(rules, config.get_boolean_config())
+					   
+	rules = data.get_type_enf_rules(_ruletype = ["allow"],
+								    _source = query.source,
+								    _target = query.target, 
+								    _tclass = query.tclass,
+									_perms = query.perms,
+									_booleans = query.boolean
+								    )
+
+	# filtering
+
+	if query.filter_bools != None:
+		rules = data.filter_terules_boolean(rules, query.filter_bools)
+
+	#attribute containing "main domain"
+	main_domain = "source" if query.source else "target"
+
+	# filter attribute rules
+	filtered_rules = []
+	if query.filter_attrs:
+		for rule in rules:
+			attr = str(getattr(rule, main_domain))
+
+			#skip filtered attributes
+			if attr in query.filter_attrs:
+				continue
+			filtered_rules.append(rule)
+
+	# expand rules ending in attribute
+	'''
+	rules = []
+	other_side = "source" if main_domain == "target" else "target"
+	attributes = data.get_attributes
+	for rule in filtered_rules:
+		if data.is_attribute(getattr(rule, other_side)):
+			for t in getattr(rule, other_side).expand():
+				#print("TYPES>>>>", [str(x) for x in getattr(rule, other_side).expand()])
+				new_rule = copy.deepcopy(rule)
+				print("NEW_RULE>> ", new_rule)
+				#setattr(new_rule, other_side, t) 
+				new_rule.target = t
+				rules.append(new_rule)
+		else:
+			rules.append(rule)
+'''
+
+	rules = []
+	other_side = "source" if main_domain == "target" else "target"
+	attributes = data.get_attributes
+	for rule in filtered_rules:
+		if data.is_attribute(getattr(rule, other_side)):
+			rules.extend(data.half_expand_rule(rule, main_domain == "target"))
+		else:
+			rules.append(rule)
+
+	
 
 
-	filtered_attributes = set(['domain', 'daemon'])
-	#filtering
-	for rule in rules:
-		source = str(rule.source)
-
-		#skip filtered attributes
-		#if source in filtered_attributes:
-		#	continue
-
-	visualise_rules(query['main_domain'], True, rules)
+	visualise_rules(getattr(query, main_domain), True, rules)
 
 
 #main_domain - string (source/destination of given rules)
@@ -172,12 +217,15 @@ def visualise_rules(main_domain, is_source, rules):
 	my_attributes = data.get_attributes_of(main_domain)
 	# dictionary containing sets of edges corresponding to each attribute
 	# attribute_edges['attribute'] = [edges_corresponding_to_attribute]
-	attribute_edges = {}
+	attribute_edges = defaultdict(list)
 
 	#edges corresponding to boolean-conditioned rules
 	conditional_edges = set() 
 
 	edge_labels = defaultdict(list)
+
+	#booleans and edges they controll
+	booleans = defaultdict(set)
 
 	#TODO skip loops (edge form vertex to itself)
 	for i in rules:
@@ -187,35 +235,39 @@ def visualise_rules(main_domain, is_source, rules):
 		if is_source:
 			#change source to "main_domain" if it is an attribute
 			if source in my_attributes:
-				if(source in attribute_edges):
-					attribute_edges[source].append((main_domain, target))
-				else:
-					attribute_edges[source] = [(main_domain, target)]
+				attribute_edges[source].append((main_domain, target))
 				source = main_domain
 		else:
 			#change target to "main_domain" if it is an attribute
 			if target in my_attributes:
-				if(target in attribute_edges):
-					attribute_edges[target].append((source, main_domain))
-				else:
-					attribute_edges[target] = [(source, main_domain)]
+				attribute_edges[target].append((source, main_domain))
 				target = main_domain
 
 		edge_labels[(source, target)].extend([str(x) for x in i.perms])
 
 		if data.is_conditional(i):
+			booleans[data.is_conditional(i)].add(target if is_source else source)
 			conditional_edges.add((source, target))
+	
+	#print booleans
+	print("Boolean conditioned edges:\n")
+	for key,value in booleans.iteritems():
+		print(key+":")
+		for t in value:
+			print("\t",t)
 
 	process_edge_labels(edge_labels)
 
-	
+	#remove self loops
+	edge_labels.pop((main_domain, main_domain), None)
+
 	make_graph(edge_labels, attribute_edges, conditional_edges, main_domain)
 # edges -> dictionary {(pair_of_nodes):label}
 # colored_edges -> dictionary {group_name:[group_edges]}
 def make_graph(edges, colored_edges, dotted_edges, me):
 	G = nx.DiGraph()
-	for (x,y) in edges.keys():
-		print(x + " - " + y)
+	#for (x,y) in edges.keys():
+	#	print(x + " - " + y)
 
 	G.add_edges_from(edges.keys()) # nodes are added with keys - no unconnected edges
 
@@ -255,8 +307,8 @@ def make_graph(edges, colored_edges, dotted_edges, me):
 
 	solid_edges = set(G.edges())-dotted_edges
 	
-	nx.draw_networkx_edges(G,pos,solid_edges,width=1.0,alpha=1)
-	nx.draw_networkx_edges(G,pos,dotted_edges, style = "dashed",width=1.0,alpha=1)
+	nx.draw_networkx_edges(G,pos,solid_edges, edge_color = "grey", width=1.0,alpha=1)
+	nx.draw_networkx_edges(G,pos,dotted_edges, edge_color = "grey", style = "dashed",width=1.0,alpha=1)
 
 	nx.draw_networkx_edge_labels(G,pos, edge_labels = edges, clip_on = True, label_pos=0.5, font_size=13)
 	pos2 = {}
@@ -290,7 +342,6 @@ def make_graph(edges, colored_edges, dotted_edges, me):
 	nx.draw_networkx_labels(G, pos2, nodelist = edges_legend, font_size=16)
 	nx.draw_networkx_nodes(G, pos, nodelist = edges_legend, node_color = edge_colors)
 	#------------------------------
-
 
 	plt.savefig("path.pdf", format='pdf', dpi=500)
 	#plt.show()
