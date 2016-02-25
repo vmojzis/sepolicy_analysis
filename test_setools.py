@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import policy_data_collection as data
 import sys
 import visualization as vis
@@ -7,7 +7,6 @@ import edge_labels_optimizer as elo
 
 #print data.get_attributes_of("init_t")
 #print "\n".join(sorted([str(x) for x in data.get_type_enf_rules(["allow"], "mozilla_plugin_t")]))
-
 
 #Domain grouping
 #./domain_grouping.py
@@ -28,4 +27,15 @@ import edge_labels_optimizer as elo
 #vis.apply_query({'main_domain':'rdisc_t'})
 #data.get_types_of()
 #print type(data.get_attributes_of_("init_t")[0])
-print(elo.perm_sets_hierarchy())
+hierarchy = elo.perm_sets_hierarchy()
+
+for key,value in hierarchy.items():
+	print("'", key, "':", value,",",sep="")
+#for key,value in hierarchy.items():
+#	for key2,value2 in hierarchy.items():
+#		if key != key2 and value == value2:
+#			print(key, " >> ", key2)
+	#if key.lower() in value:
+		#print(key," >> ", value)
+
+#elo.format_perms()

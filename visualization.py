@@ -235,7 +235,7 @@ def visualise_rules(main_domain, is_source, rules):
 	
 	#print booleans
 	print("Boolean conditioned edges:\n")
-	for key,value in booleans.iteritems():
+	for key,value in booleans.items():
 		print(key+":")
 		for t in value:
 			print("\t",t)
@@ -262,7 +262,7 @@ def make_graph(edges, colored_edges, dotted_edges, me):
 	pos=nx.circular_layout(G2)
 	del(G2)
 	
-	pos[me] = [0,0]
+	pos[me] = [0.5,0.5]
 
 	#######################
 	# customized graph drawing
@@ -301,7 +301,7 @@ def make_graph(edges, colored_edges, dotted_edges, me):
 	nx.draw_networkx_edge_labels(G,pos, edge_labels = edges, clip_on = True, label_pos=0.5, font_size=13)
 	pos2 = {}
 	for vector in G.node:
-		pos2[vector] = [pos[vector][0], pos[vector][1]+ 2.0/figsize]
+		pos2[vector] = [pos[vector][0], pos[vector][1]+ 1.0/figsize]
 
 	nx.draw_networkx_labels(G,pos2,font_size=16)
 
@@ -313,16 +313,16 @@ def make_graph(edges, colored_edges, dotted_edges, me):
 
 	#2.5 in graph coordinates is width of the whole graph
 	if len(edges_legend) < 2:
-		x_pos = 0
+		x_pos = 0.5
 		_delta = 0
 	else:
-		_delta = 2.4/(len(edges_legend)-1)
-		x_pos = -1.2
+		_delta = 1/(len(edges_legend)-1)
+		x_pos = 0
 	for attr in edges_legend:
-		pos2[attr.upper()] = [x_pos,-1.3+2.0/figsize]
-		pos[attr.upper()] = [x_pos,-1.3]
+		pos2[attr.upper()] = [x_pos,-0.1+1.0/figsize]
+		pos[attr.upper()] = [x_pos,-0.1]
 		x_pos += _delta
-
+	
 	#permission sets legend
 	#print("\n\n\n")
 	print_permission_sets()
