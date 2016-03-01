@@ -15,26 +15,7 @@ import matplotlib.colors as colors
 from collections import defaultdict
 import copy
 
-'''
-perm_sets = [
-	("MANAGE", {"create", "open", "getattr", "setattr", "read", "write", "append", "rename", "link", "unlink", "ioctl", "lock"}),
-	("RW", {"open", "getattr", "read", "write", "append", "ioctl", "lock"}),
-	("RW_INH", {"getattr", "read", "write", "append", "ioctl", "lock"}),
-	("WRITE", {"open", "getattr", "write", "append", "lock", "ioctl"}),
-	("WRITE_INH", {"getattr", "write", "append", "lock", "ioctl"}),
-	("READ", {"open", "getattr", "read", "ioctl", "lock"}),
-	("READ_INH", {"getattr", "read", "ioctl", "lock"}),
-	("CREATE", {"getattr", "create", "open"}),
-	("EXEC", {"getattr", "open", "read", "execute", "ioctl", "execute_no_trans"}),
-	("SIGNAL", {"sigchld", "sigkill", "sigstop", "signull", "signal"}), ]
-'''
 
-
-#perm_sets_hierarchy = {
-#	["MANAGE", "RW", "RW_INH", "WRITE", "WRITE_INH", "READ", "READ_INH"],
-#	["MANAGE", "EXEC"]
-#	["MANAGE", "CREATE"]
-#	}
 
 # creates a dictionary of permission sets contained in each permission set
 # {perm_set:[smaller_perm_sets]}
@@ -56,11 +37,13 @@ def perm_sets_hierarchy():
 
 def print_permission_sets():
 	print("\nCapitalised words in edge labels are permission sets containing the following permissions:\n")
-	for label, perm_list in perm_sets:
+	for label, perm_list in sorted(perm_sets):
 		print(label + ": " + ", ".join(sorted(perm_list)))
 
 #replace permissions by corresponding permission set names - reduces edge description length
 def process_edge_labels(labels):
+	graph_size = len(labels)
+	max_len = int(graph_size/15) if graph_size/15 > 4 else 4
 	#print(perm_sets)
 	for edge in labels:
 		label = set(labels[edge])
@@ -81,14 +64,21 @@ def process_edge_labels(labels):
 			new_label -= perm_sets_hierarchy.get(item, set())
 
 		del l_copy
+		
+		new_label = sorted(new_label | (label - to_remove))
+		if len(new_label) > max_len:
+			new_label = new_label[:max_len]
+			new_label.append("<...>")
+		labels[edge] = ", ".join(new_label)
 
-		labels[edge] = ", ".join(sorted(new_label | (label - to_remove)))
 	return labels
 
 
-##### permission sets to replace on graph edges --- !!! generate corresponding perm_sets_hierarchy (below) -- performance issue
 
+
+##### permission sets to replace on graph edges --- !!! generate corresponding perm_sets_hierarchy (below) -- performance issue
 perm_sets = [
+	#duplicate permission sets have to be commented out
 	('CREATE_MSGQ', {'associate', 'create', 'destroy', 'enqueue', 'getattr', 'read', 'setattr', 'unix_read', 'unix_write', 'write'}),
 	('MOUNT_FS', {'getattr', 'mount', 'remount', 'unmount'}),
 	('RW_SEM', {'associate', 'getattr', 'read', 'unix_read', 'unix_write', 'write'}),
@@ -229,15 +219,15 @@ def format_perms():
 
 
 '''
-def process_edge_labels(labels):
-	#print(perm_sets)
-	for edge in labels:
-		label = set(labels[edge])
-		for (name,perm_list) in perm_sets:
-			if perm_list.issubset(label):
-				label = label - perm_list
-				label.add(name)
-
-				#print("DIFF> ", diff(label, perm_list))
-		labels[edge] = ", ".join(label)
+perm_sets = [
+	("MANAGE", {"create", "open", "getattr", "setattr", "read", "write", "append", "rename", "link", "unlink", "ioctl", "lock"}),
+	("RW", {"open", "getattr", "read", "write", "append", "ioctl", "lock"}),
+	("RW_INH", {"getattr", "read", "write", "append", "ioctl", "lock"}),
+	("WRITE", {"open", "getattr", "write", "append", "lock", "ioctl"}),
+	("WRITE_INH", {"getattr", "write", "append", "lock", "ioctl"}),
+	("READ", {"open", "getattr", "read", "ioctl", "lock"}),
+	("READ_INH", {"getattr", "read", "ioctl", "lock"}),
+	("CREATE", {"getattr", "create", "open"}),
+	("EXEC", {"getattr", "open", "read", "execute", "ioctl", "execute_no_trans"}),
+	("SIGNAL", {"sigchld", "sigkill", "sigstop", "signull", "signal"}), ]
 '''

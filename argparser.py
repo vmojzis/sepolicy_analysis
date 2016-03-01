@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
@@ -8,6 +8,8 @@ import config_loading as config
 import argparse
 import visualization as vis
 import policy_data_collection as data
+import userquery as query
+import domain_grouping as grouping
 
 # parse comma separated list of [boolean_name]:[on/off] 
 def parse_bool_config(bool_arg):
@@ -61,6 +63,10 @@ for arg in ["perms", "attr", "boolean", "tclass"]:
 if args.filter_bools != None:
 	args.filter_bools = parse_bool_config(args.filter_bools)
 
+# Only one of "source" and "destination" may be set
+# The one which is set becomes "main_domain" - centerpoint of the query
+args.main_domain = args.source if args.source else args.target
+
 
 '''
 if args.tclass:
@@ -70,6 +76,10 @@ if args.tclass:
 	args.tclass = args.tclass.split(",")
 '''
 
-vis.apply_query(args)
+q = query.UserQuery(args)
+#q.apply_query()
+
+q.apply_query_grouping(grouping.group_types_name())
+#vis.apply_query(args)
 
 #print(args)

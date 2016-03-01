@@ -4,6 +4,7 @@ import sys
 import visualization as vis
 import config_loading as config
 import edge_labels_optimizer as elo
+import domain_grouping as grouping
 
 #print data.get_attributes_of("init_t")
 #print "\n".join(sorted([str(x) for x in data.get_type_enf_rules(["allow"], "mozilla_plugin_t")]))
@@ -27,10 +28,7 @@ import edge_labels_optimizer as elo
 #vis.apply_query({'main_domain':'rdisc_t'})
 #data.get_types_of()
 #print type(data.get_attributes_of_("init_t")[0])
-hierarchy = elo.perm_sets_hierarchy()
 
-for key,value in hierarchy.items():
-	print("'", key, "':", value,",",sep="")
 #for key,value in hierarchy.items():
 #	for key2,value2 in hierarchy.items():
 #		if key != key2 and value == value2:
@@ -39,3 +37,7 @@ for key,value in hierarchy.items():
 		#print(key," >> ", value)
 
 #elo.format_perms()
+print("\n".join([str(x) for x in grouping.group_types_name().values()]))
+#grouping.group_types_name()
+#print([str(x) for x in grouping.group_types_name().values()])
+#print("\n".join(grouping.get_unassigned_types()))

@@ -59,7 +59,7 @@ def get_types():
 def get_domain_types():
 	q = setools.TypeAttributeQuery(setools.SELinuxPolicy())
 	q.name = "domain"
-	results = q.results().next() #should contain only 1 item - TypeAttribute("domain")
+	results = next(q.results()) #should contain only 1 item - TypeAttribute("domain")
 	if results:
 		return [str(x) for x in results.expand()]
 	else :
@@ -162,7 +162,7 @@ def get_booleans():
 # is given type enforcement rule conditional?
 def is_conditional(rule):
 	try:
-		if type(rule) == setools.policyrep.terule.ExpandedAVRule:
+		if type(rule) in [setools.policyrep.terule.ExpandedTERule, setools.policyrep.terule.ExpandedAVRule] :
 			boolean = str(rule.origin.conditional)
 		else:
 			boolean = str(rule.conditional)

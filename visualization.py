@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
@@ -33,7 +33,7 @@ def get_cmap(N):
     return map_index_to_rgb_color
 
 
-
+'''
 def foo_():
 	#me = 'init_t'
 	#me = 'mozilla_plugin_t'
@@ -143,7 +143,7 @@ def foo():
 
 	
 	make_graph(edge_labels, attribute_edges, dotted_edges, me)
-
+'''
 
 # query - argparser output
 #TODO - specify the query and write command line argument reading
@@ -176,26 +176,28 @@ def apply_query(query):
 				continue
 			filtered_rules.append(rule)
 
-	'''
+	
 	# expand rules ending in attribute
-	rules = []
-	other_side = "source" if main_domain == "target" else "target"
-	attributes = data.get_attributes
-	for rule in filtered_rules:
-		if data.is_attribute(getattr(rule, other_side)):
-			rules.extend(data.half_expand_rule(rule, main_domain == "target"))
-		else:
-			rules.append(rule)
-	'''
-	rules = filtered_rules	
+	if True:
+		rules = []
+		other_side = "source" if main_domain == "target" else "target"
+		attributes = data.get_attributes
+		for rule in filtered_rules:
+			if data.is_attribute(getattr(rule, other_side)):
+				rules.extend(data.half_expand_rule(rule, main_domain == "target"))
+			else:
+				rules.append(rule)
+		#apply_domain_grouping()
+
+	else:
+		rules = filtered_rules	
 
 
-	visualise_rules(getattr(query, main_domain), main_domain == "source", rules)
-
+	visualise_rules(query.main_domain, bool(query.source), rules)
 
 #main_domain - string (source/destination of given rules)
 #is_source - True if main_domain (and it's attributes) is source of given rules
-#rules - list of [TERule]
+#rules - array of [AVRule|TERule|ExpandedAVRule|ExpandedTERule]
 def visualise_rules(main_domain, is_source, rules):
 	
 	my_attributes = data.get_attributes_of(main_domain)
