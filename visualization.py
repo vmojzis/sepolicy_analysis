@@ -200,7 +200,7 @@ def apply_query(query):
 #rules - array of [AVRule|TERule|ExpandedAVRule|ExpandedTERule]
 def visualise_rules(main_domain, is_source, rules):
 	
-	my_attributes = data.get_attributes_of(main_domain)
+	my_attributes = data.get_attributes_of_str(main_domain)
 	# dictionary containing sets of edges corresponding to each attribute
 	# attribute_edges['attribute'] = [edges_corresponding_to_attribute]
 	attribute_edges = defaultdict(list)
@@ -248,6 +248,65 @@ def visualise_rules(main_domain, is_source, rules):
 	edge_labels.pop((main_domain, main_domain), None)
 
 	make_graph(edge_labels, attribute_edges, conditional_edges, main_domain)
+
+#main_domain - string (source/destination of given rules)
+#is_source - True if main_domain (and it's attributes) is source of given rules
+#rules - array of [AVRule|TERule|ExpandedAVRule|ExpandedTERule]
+def visualise_rules_grouping(main_group, is_source, rules):
+	main_domain = main_group.name.upper()
+	my_attributes = set()
+	for _type in main_group.types:
+		my_attributes |= set(data.get_attributes_of_str(_type))
+
+	#my_attributes = data.get_attributes_of(main_domain)
+	# dictionary containing sets of edges corresponding to each attribute
+	# attribute_edges['attribute'] = [edges_corresponding_to_attribute]
+	attribute_edges = defaultdict(list)
+
+	#edges corresponding to boolean-conditioned rules
+	conditional_edges = set() 
+
+	edge_labels = defaultdict(list)
+
+	#booleans and edges they controll
+	booleans = defaultdict(set)
+
+	#TODO skip loops (edge form vertex to itself)
+	for i in rules:
+		source = str(i.source)
+		target = str(i.target)
+
+		if is_source:
+			#change source to "main_domain" if it is an attribute
+			if source in my_attributes:
+				attribute_edges[source].append((main_domain, target))
+				source = main_domain
+		else:
+			#change target to "main_domain" if it is an attribute
+			if target in my_attributes:
+				attribute_edges[target].append((source, main_domain))
+				target = main_domain
+
+		edge_labels[(source, target)].extend([str(x) for x in i.perms])
+
+		if data.is_conditional(i):
+			booleans[data.is_conditional(i)].add(target if is_source else source)
+			conditional_edges.add((source, target))
+	
+	#print booleans
+	print("Boolean conditioned edges:\n")
+	for key,value in booleans.items():
+		print(key+":")
+		for t in value:
+			print("\t",t)
+
+	process_edge_labels(edge_labels)
+
+	#remove self loops
+	edge_labels.pop((main_domain, main_domain), None)
+
+	make_graph(edge_labels, attribute_edges, conditional_edges, main_domain)
+
 # edges -> dictionary {(pair_of_nodes):label}
 # colored_edges -> dictionary {group_name:[group_edges]}
 def make_graph(edges, colored_edges, dotted_edges, me):

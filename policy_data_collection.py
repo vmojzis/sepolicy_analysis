@@ -66,7 +66,11 @@ def get_domain_types():
 		return []
 	
 # returns attributes of given type
-def get_attributes_of(type_name):
+def get_attributes_of(type):
+	return [str(x) for x in type.expand()]
+
+# returns attributes of given type
+def get_attributes_of_str(type_name):
 	q = setools.TypeQuery(setools.SELinuxPolicy())
 	q.name = type_name
 	results = []
@@ -87,7 +91,7 @@ def get_types_of_str(attr_name):
 		return []
 
 # returns types that have given attribute
-def get_types_of_str(attr):
+def get_types_of(attr):
 	return [str(x) for x in attr.expand()]
 
 # Get type enforcement rules (same behaviour as sesearch) 
@@ -176,50 +180,9 @@ def is_attribute(obj):
 	return (type(obj) == setools.policyrep.typeattr.TypeAttribute)
 
 
-# query - argparser output
-#TODO - specify the query and write command line argument reading
-def apply_query(query):
-					   
-	rules = data.get_type_enf_rules(_ruletype = ["allow"],
-								    _source = query.source,
-								    _target = query.target, 
-								    _tclass = query.tclass,
-									_perms = query.perms,
-									_booleans = query.boolean
-								    )
-
-	# filtering
-
-	if query.filter_bools != None:
-		rules = data.filter_terules_boolean(rules, query.filter_bools)
-
-	#attribute containing "main domain"
-	main_domain = "source" if query.source else "target"
-
-	# filter attribute rules
-	filtered_rules = []
-	if query.filter_attrs:
-		for rule in rules:
-			attr = str(getattr(rule, main_domain))
-
-			#skip filtered attributes
-			if attr in query.filter_attrs:
-				continue
-			filtered_rules.append(rule)
-
-	# expand rules ending in attribute
-	rules = []
-	other_side = "source" if main_domain == "target" else "target"
-	attributes = data.get_attributes
-	for rule in filtered_rules:
-		if data.is_attribute(getattr(rule, other_side)):
-			for t in getattr(rule, other_side).expand():
-				new_rule = copy.deepcopy(rule) 
-				setattr(new_rule, other_side, t) 
-				rules.append(new_rule)
-		else:
-			rules.append(rule)
-	return rules
+# return expanded te rule
+def make_expanded_rule(original_rule, source, target):
+	return setools.policyrep.terule.expanded_te_rule_factory(original_rule, source, target)
 
 
 #print "Attribute count: " + str(len(get_all_attributes()))

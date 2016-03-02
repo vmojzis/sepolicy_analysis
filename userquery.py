@@ -60,7 +60,7 @@ class UserQuery:
 		if False:
 			rules = []
 			other_side = "target" if self.qargs.source else "source"
-			attributes = data.get_attributes
+			#attributes = data.get_attributes
 			for rule in filtered_rules:
 				if data.is_attribute(getattr(rule, other_side)):
 					rules.extend(data.half_expand_rule(rule, self.qargs.source))
@@ -86,9 +86,8 @@ class UserQuery:
 			pass # TODO: raise exception
 
 		rules = []
+		#get all rules corresponding to source domain group
 		for type_ in group.types:
-			if type_ == "racoon_t":
-				continue
 			rules += data.get_type_enf_rules(_ruletype = ["allow"],
 										    _source = self.qargs.source,
 										    _target = self.qargs.target, 
@@ -122,7 +121,7 @@ class UserQuery:
 		if False:
 			rules = []
 			other_side = "target" if self.qargs.source else "source"
-			attributes = data.get_attributes
+			#attributes = data.get_attributes
 			for rule in filtered_rules:
 				if data.is_attribute(getattr(rule, other_side)):
 					rules.extend(data.half_expand_rule(rule, self.qargs.source))
@@ -133,9 +132,30 @@ class UserQuery:
 		else:
 			rules = filtered_rules	
 
+		rules =_rewrite_rules_grouping(rules, domain_grouping)
+
 		#return QueryResults(self.qargs, rules)
 
-		vis.visualise_rules(self.qargs.main_domain, bool(self.qargs.source), rules)
+		#vis.visualise_rules(self.qargs.main_domain, bool(self.qargs.source), rules)
+		vis.visualise_rules_grouping(main_group, bool(self.qargs.source), rules)
+		
+
+#
+def _rewrite_rules_grouping(rules, domain_grouping):
+	results = []
+	#reversal of domain grouping - for fast inverse search
+	reverse_grouping = {}
+	for group in domain_grouping.values():
+		for _type in group.types:
+			reverse_grouping[_type] = group.name.upper()
+	
+	for rule in rules:
+		results.append(data.make_expanded_rule(rule, 
+											   reverse_grouping.get(rule.source, rule.source), 
+											   reverse_grouping.get(rule.target, rule.target)))
+	return results
+
+
 
 class QueryResults:
 	def __init__(self, args, rules):
