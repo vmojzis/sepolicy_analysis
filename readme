@@ -23,3 +23,11 @@ Installation:
 		- otherwise edit the inlude statement in "policy_data_collection.py"
 	As of yet, the project is far form finished and most of the functionality is not interconnected
 		- "test_setools.py" contains example uses of implemented functionality
+
+Domain grouping:
+	* Get cil files from /var/lib/selinux/targeted/active/modules/100/<module_name>/cil, extract them,
+	  and save them in a directory as <module_name>.cil
+	  (Done by extract_cil.sh)
+	
+	* Run domain_grouping.parse_cil_files(path_cil_files) and save result to domain_groups_cil.conf
+	  (contains colon-separated triples "group_name:domain_types:resource_types")

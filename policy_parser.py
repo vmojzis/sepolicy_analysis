@@ -1,32 +1,36 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from os import walk
+#from os import walk
 import sys
+import os
+import re
 
-
-# read .te files in given path and return list of tuples
+# read .cil files in given path and return list of tuples
 # (filename, [types])
-def get_types_contrib(path):
+# cil files are located in
+# /var/lib/selinux/targeted/active/modules/100/*/cil
+def get_types_cil(path):
 
 	filepaths = []
 	#get files in given directory
-	for (dirpath, dirnames, filenames) in walk(mypath):
+	for (dirpath, dirnames, filenames) in os.walk(path):
 		# tuples (filename,full_file_path)
 
 		filepaths.extend(
-				((filename, os.path.join(dirpath, filename)) for filename in filenames 
-				if filename.endswith(".te"))
+				((filename[:-4], os.path.join(dirpath, filename)) for filename in filenames 
+				if filename.endswith(".cil"))
 		)
-    	break # don't go deeper
-    
-    results = []
-    for filename,path in filepaths:
-    	types = get_types(path)
+		break # don't go deeper
+	
+	results = []
+	
+	for filename,path in filepaths:
+		types = get_types(path)
 
-    	if types:
-	    	results.append((filename, types))
-    return results
+		if types:
+			results.append((filename, types))
+	return results
 
 
 
@@ -36,16 +40,19 @@ def get_types(file_path):
 		
 		txt = open(file_path, "r")
 
+		#regexp finding lines containing type definitions
+		#eg. (type lib_t)
+		#Contains only 1 group that matches the type name
+		regexp = re.compile(r"\s*\(\s*type\s+([\w-]+)\s*\)\s*")
+
 		types = list()
 		for line in txt:
-			line = line.strip()
-			if line.startswith('#')
-				continue
-			types.append(_type)
+			result = regexp.match(line)
+			if result:
+				types.append(result.group(1))
+		
 		return types
 
 	except IOError as e:
 		return []
 
-
-/var/lib/selinux/targeted/active/modules/100/*/cil

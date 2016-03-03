@@ -5,6 +5,7 @@ import visualization as vis
 import config_loading as config
 import edge_labels_optimizer as elo
 import domain_grouping as grouping
+import policy_parser as pparse
 
 #print data.get_attributes_of("init_t")
 #print "\n".join(sorted([str(x) for x in data.get_type_enf_rules(["allow"], "mozilla_plugin_t")]))
@@ -37,7 +38,13 @@ import domain_grouping as grouping
 		#print(key," >> ", value)
 
 #elo.format_perms()
-print("\n".join([str(x) for x in grouping.group_types_name().values()]))
-#grouping.group_types_name()
+#print("\n".join([str(x) for x in grouping.group_types_name().values()]))
+#print("\n".join([str(x) for x in grouping.group_types_cil('/home/vmojzis/cil/__extracted').values()]))
+#print(grouping.group_types_name())
+#grouping.group_types_cil('/home/vmojzis/cil/__extracted')
 #print([str(x) for x in grouping.group_types_name().values()])
 #print("\n".join(grouping.get_unassigned_types()))
+#print("\n".join([str(x) for x in pparse.get_types_cil('/home/vmojzis/cil/__extracted/')]))
+#print(grouping.group_types_cil('/home/vmojzis/cil/__extracted'))
+
+grouping.group_types_cil('/home/vmojzis/cil/__extracted')

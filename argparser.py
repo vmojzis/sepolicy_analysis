@@ -79,7 +79,7 @@ if args.tclass:
 q = query.UserQuery(args)
 #q.apply_query()
 
-q.apply_query_grouping(grouping.group_types_name())
+q.apply_query_grouping(grouping.group_types_cil())
 #vis.apply_query(args)
 
 #print(args)

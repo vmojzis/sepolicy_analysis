@@ -12,6 +12,8 @@ import bisect
 import sys
 import copy
 import policy_data_collection as data
+import policy_parser as pparse
+
 
 class DomainGroup(object):
 	"""
@@ -57,7 +59,7 @@ class DomainGroup(object):
 	def contains(self, type_):
 		return (type_ in self.domains or type_ in self.resources) 
 
-#is "x" in sorted list "slist" (can be substring of some item in slist)?
+#is "x" in sorted list "slist" (can be substring of some item in slist) ?
 def in_sorted(x, slist):
 	first = (x.split("_"))[0]
 	i = bisect.bisect_left(slist, first)
@@ -177,22 +179,49 @@ def group_types_name():
 
 	return domain_groups
 
-
-# Scan system for domain and object types and group them by name
-def group_types_name_combined(): 
-	# get all type names and remove trailing "_t"
-	type_list = set([x[:-2].lower() for x in data.get_types()])
-
+############################### cil module file based grouping #####################
+# Scan system for domain and object types and group them
+# according to cil module files located in "path"
+# Results are printed to stdout (to be saved in domain_groups_cil.conf)
+def parse_cil_files(path):
+	# get all type
+	type_list = set([x for x in data.get_types()])
 	#get types corresponding to "domains" - runnables
-	subject_list = set([x[:-2].lower() for x in data.get_domain_types()])
+	subject_list = set([x for x in data.get_domain_types()])
 
-	object_list = sorted(type_list - subject_list)#, key=lambda s: s.lower())
-	type_list = sorted(type_list)#, key=lambda s: s.lower())
+	object_list = type_list - subject_list
 
-	domain_groups = create_domain_groups(subject_list, object_list)
+	cil = pparse.get_types_cil(path)
 	
-	return domain_groups, create_resource_groups(domain_groups, object_list)
+	for (name,types) in cil:
+		types = set(types)
+		domains = types & subject_list
+		resources = types - domains
+		print(name,":",",".join(domains),":", ",".join(resources),sep="")
 
+# load domain groups from domain_groups_cil.conf file
+# and return them as ditionary {group_name:DomainGroup()}
+def group_types_cil(): 
+	try:
+		txt = open("domain_groups_cil.conf", "r")
+
+		domain_groups = {}
+		for line in txt:
+			# group_name:domain_types:resource_types
+			line = line.strip()
+			line = line.split(":")
+			if len(line) == 3:
+				new_group = DomainGroup(line[0])
+				new_group.domains = set(line[1].split(","))
+				new_group.resources = set(line[2].split(","))
+				domain_groups[line[0]] = new_group
+
+		return domain_groups
+
+	except IOError as e:
+		return {}
+
+	#return domain_groups #, create_resource_groups(domain_groups, object_list)
 
 #print subject_name(sys.argv[1], object_list)
 #for subject in subject_list:
