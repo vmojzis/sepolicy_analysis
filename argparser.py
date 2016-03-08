@@ -6,10 +6,12 @@ from __future__ import print_function
 import config_loading as config
 
 import argparse
+import sys
 import visualization as vis
 import policy_data_collection as data
 import userquery as query
 import domain_grouping as grouping
+
 
 # parse comma separated list of [boolean_name]:[on/off] 
 def parse_bool_config(bool_arg):
@@ -26,10 +28,20 @@ parser = argparse.ArgumentParser(description='SELinux policy analysis tool.')
 
 search = parser.add_argument_group("Rule search (simillar to sesearch)")
 
-search.add_argument("-s", "--source",
-                  help="Source type/role of the TE/RBAC rule.")
-search.add_argument("-t", "--target",
-                  help="Target type/role of the TE/RBAC rule.")
+source_target = search.add_mutually_exclusive_group()
+
+source_target_group = search.add_mutually_exclusive_group()
+
+source_target.add_argument("-s", "--source",
+                  help="Source type of the TE rule.")
+source_target.add_argument("-t", "--target",
+                  help="Target type of the TE rule.")
+
+source_target_group.add_argument("-sg", "--source_group",
+                  help="Source type (consider whole domain group containing the type) of the TE rule.")
+source_target_group.add_argument("-tg", "--target_group",
+                  help="Target type (consider whole domain group containing the type) of the TE rule.")
+
 search.add_argument("-c", "--class", dest="tclass",
                   help="Comma separated list of object classes")
 search.add_argument("-p", "--perms", metavar="PERMS",
@@ -40,8 +52,13 @@ search.add_argument("-D", "--default",
                   help="Default of the rule. (type/role/range transition rules)")
 search.add_argument("-b", "--bool", dest="boolean", metavar="BOOL",
                   help="Comma separated list of Booleans in the conditional expression.")
+search.add_argument("-ea", action="store_true", dest="expand_attributes",
+                  help="Expand rules ending in attribute (to all types that have given attribute).")
 
 filtering = parser.add_argument_group("Filtering")
+
+filtering.add_argument("-dg", action="store_true", dest="domain_grouping",
+                  help="Group SELinux domains based on package they belong to.")
 
 filtering.add_argument("-fb", "--filter_bools", nargs="?", dest="filter_bools", const="",
                   help="Filter rules based on current boolean setting \
@@ -54,6 +71,12 @@ filtering.add_argument("-fa", "--filter_attrs", dest="filter_attrs", metavar="AT
 
 args = parser.parse_args()
 
+
+if not (args.source or args.target or args.source_group or args.target_group):
+	parser.print_usage()
+	print("error: Specify one of [SOURCE, TARGET, SOURCE_GROUP, TARGET_GROUP]!", file=sys.stderr)
+	sys.exit()
+
 # split list attributes
 for arg in ["perms", "attr", "boolean", "tclass"]:
 	value = getattr(args, arg)
@@ -65,6 +88,10 @@ if args.filter_bools != None:
 
 # Only one of "source" and "destination" may be set
 # The one which is set becomes "main_domain" - centerpoint of the query
+if args.source_group:
+	args.source = args.source_group
+if args.target_group:
+	args.target = args.target_group
 args.main_domain = args.source if args.source else args.target
 
 
@@ -79,7 +106,8 @@ if args.tclass:
 q = query.UserQuery(args)
 #q.apply_query()
 
-q.apply_query_grouping(grouping.group_types_cil())
+#q.apply_query_grouping(grouping.group_types_cil())
+q.apply_query()
 #vis.apply_query(args)
 
 #print(args)
