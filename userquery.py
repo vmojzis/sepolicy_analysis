@@ -142,7 +142,7 @@ class UserQuery:
 		return results
 
 
-	def filter_attribute_rules(rules):
+	def filter_attribute_rules(self, rules):
 		# filter attribute rules
 		filtered_rules = []
 		for rule in rules:
