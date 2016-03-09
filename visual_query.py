@@ -66,8 +66,10 @@ filtering.add_argument("-fb", "--filter_bools", nargs="?", dest="filter_bools", 
 
 filtering.add_argument("-fa", "--filter_attrs", dest="filter_attrs", metavar="ATTR",
                   help="Filter out rules allowed for specified attributes. \
-                  		ATTR - Comma separted list of attributes.")
+                  		ATTR - Comma separated list of attributes.")
 
+parser.add_argument("-sm", "--size_multiplier", type=float, dest="size_multiplier", default=1, 
+					help="Graph canvas size multiplier (>1 increases space between nodes)")
 
 args = parser.parse_args()
 

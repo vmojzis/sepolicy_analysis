@@ -29,7 +29,7 @@ class UserQuery:
 	# gather all rules corresponding to the query and visualize them
 	def apply_query(self):
 		rules = self.gather_rules()
-		print("Got rules, starting filtering")
+		#print("Got rules, starting filtering")
 
 		# self.qargs.filter_bools can be empty list - meaning system boolean setting is in use
 		if self.qargs.filter_bools != None:
@@ -47,15 +47,23 @@ class UserQuery:
 		if self.qargs.domain_grouping:
 			rules =self.rewrite_rules_grouping(rules)
 
+		#Abort in case no rules were found
+		if len(rules) == 0:
+			print("No rules found!", file=sys.stderr)
+			sys.exit()
 
+		#vusualize results
 		if self.qargs.source_group or self.qargs.target_group:
-			vis.visualise_rules_grouping(self.main_group, bool(self.qargs.source), rules)
+			vis.visualise_rules(self.main_group.name.upper(), bool(self.qargs.source), 
+										 rules, self.qargs.size_multiplier)
 		else:
 			#non-grouping
-			vis.visualise_rules(self.qargs.main_domain, bool(self.qargs.source), rules)
+			vis.visualise_rules(self.qargs.main_domain, bool(self.qargs.source), 
+								rules, self.qargs.size_multiplier)
 
 	#get all rules corresponding to this query
 	def gather_rules(self):
+		rules = []
 		if self.qargs.domain_grouping:
 			#get domain grouping if the output should be grouped
 			self.domain_grouping = grouping.group_types_cil()
@@ -75,9 +83,9 @@ class UserQuery:
 					sys.exit()
 
 				#get all rules corresponding to source/target domain group
-				rules = []
-				for type_ in self.main_group.types:
-					print("Getting rules for: ", type_)
+				print("Gathering rules for following types: ", end="", sep="")
+				for type_ in sorted(self.main_group.types):
+					print(type_, ", ", end="", sep="", flush=True)
 					source = type_ if self.qargs.source else None
 					target = type_ if self.qargs.target else None
 					rules += data.get_type_enf_rules(_ruletype = ["allow"],
@@ -87,6 +95,7 @@ class UserQuery:
 													_perms = self.qargs.perms,
 													_booleans = self.qargs.boolean
 												    )
+				print("\n")
 		# source/target is single type
 		if not (self.qargs.source_group or self.qargs.target_group):
 			rules = data.get_type_enf_rules(_ruletype = ["allow"],
@@ -98,16 +107,16 @@ class UserQuery:
 							    )
 		return rules
 
-	def expand_rules(rules):
+	def expand_rules(self, rules):
 		expanded_rules = []
 		other_side = "target" if self.qargs.source else "source"
 		#attributes = data.get_attributes
 		for rule in rules:
 			if data.is_attribute(getattr(rule, other_side)):
-				expanded_rules.extend(data.half_expand_rule(rule, self.qargs.source))
+				expanded_rules.extend(data.half_expand_rule(rule, not self.qargs.source))
 			else:
 				expanded_rules.append(rule)
-		expanded_rules
+		return expanded_rules
 
 	def rewrite_rules_grouping(self, rules):
 		results = []
@@ -116,14 +125,14 @@ class UserQuery:
 			if self.qargs.source:
 				# Can be either one of [source_type, main_domain_group, attribute_of_source]
 				source = self.main_group.name.upper() if self.qargs.source_group and \
-														 not data.is_attribute(rule.source) \
+														 (not data.is_attribute(rule.source)) \
 													  else rule.source
 				target = self.reverse_grouping.get(rule.target)
 				#can be attribute -> won't be found in reverse_grouping
 				target = target.name.upper() if target else rule.target
 			else: #target is main
 				target = self.main_group.name.upper() if self.qargs.target_group and \
-														 not data.is_attribute(rule.target) \
+														 (not data.is_attribute(rule.target)) \
 													  else rule.target
 				source = self.reverse_grouping.get(rule.source)
 				#can be attribute -> won't be found in reverse_grouping

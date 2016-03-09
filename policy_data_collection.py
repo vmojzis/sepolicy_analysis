@@ -111,22 +111,25 @@ def get_type_enf_rules(_ruletype = ["allow"],
 					   _source_indirect = True, 
 					   _target_indirect = True):
 
-	q = setools.TERuleQuery(setools.SELinuxPolicy(),
-                            ruletype=_ruletype,
-                            source=_source,
-                            source_indirect=_source_indirect,
-                            target=_target,
-                            target_indirect=_target_indirect,
-                            tclass = _tclass,
-                            perms = _perms,
-                            boolean = _booleans)
-	#return [str(x) for x in q.results()]
+	try:
+		q = setools.TERuleQuery(setools.SELinuxPolicy(),
+	                            ruletype=_ruletype,
+	                            source=_source,
+	                            source_indirect=_source_indirect,
+	                            target=_target,
+	                            target_indirect=_target_indirect,
+	                            tclass = _tclass,
+	                            perms = _perms,
+	                            boolean = _booleans)
+		#return [str(x) for x in q.results()]
 
-	# rule.conditional_block meaning (guessing):
-	#   if rule.conditional_block == True: rule is applied if the boolean is set to True
-	# 	if rule.conditional_block == False: rule is applied if the boolean is set to False
+		# rule.conditional_block meaning (guessing):
+		#   if rule.conditional_block == True: rule is applied if the boolean is set to True
+		# 	if rule.conditional_block == False: rule is applied if the boolean is set to False
 
-	return [x for x in q.results()]
+		return [x for x in q.results()]
+	except ValueError:
+		return []
 
 # filter type enforcement rules based on boolean setting
 # rules -> generator for TERule list
@@ -177,7 +180,7 @@ def is_conditional(rule):
 
 # is given object of type "TypeAttribute"
 def is_attribute(obj):
-	return (type(obj) == setools.policyrep.typeattr.TypeAttribute)
+	return isinstance(obj, setools.policyrep.typeattr.TypeAttribute)
 
 
 # return expanded te rule

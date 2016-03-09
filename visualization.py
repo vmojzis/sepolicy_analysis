@@ -198,10 +198,7 @@ def apply_query(query):
 #main_domain - string (source/destination of given rules)
 #is_source - True if main_domain (and it's attributes) is source of given rules
 #rules - array of [AVRule|TERule|ExpandedAVRule|ExpandedTERule]
-def visualise_rules(main_domain, is_source, rules):
-	
-	my_attributes = data.get_attributes_of_str(main_domain)
-	print([str(x) for x in my_attributes])
+def visualise_rules(main_domain, is_source, rules, size_multiplier = 1):
 	# dictionary containing sets of edges corresponding to each attribute
 	# attribute_edges['attribute'] = [edges_corresponding_to_attribute]
 	attribute_edges = defaultdict(list)
@@ -226,7 +223,7 @@ def visualise_rules(main_domain, is_source, rules):
 				source = main_domain
 		else:
 			#change target to "main_domain" if it is an attribute
-			if target in my_attributes:
+			if data.is_attribute(i.target):
 				attribute_edges[target].append((source, main_domain))
 				target = main_domain
 
@@ -248,7 +245,8 @@ def visualise_rules(main_domain, is_source, rules):
 	#remove self loops
 	edge_labels.pop((main_domain, main_domain), None)
 
-	make_graph(edge_labels, attribute_edges, conditional_edges, main_domain)
+
+	make_graph(edge_labels, attribute_edges, conditional_edges, main_domain, size_multiplier)
 
 #main_domain - string (source/destination of given rules)
 #is_source - True if main_domain (and it's attributes) is source of given rules
@@ -295,7 +293,8 @@ def visualise_rules_grouping(main_group, is_source, rules, size_multiplier = 1):
 			conditional_edges.add((source, target))
 	
 	#print booleans
-	print("Boolean conditioned edges:\n")
+	if booleans:
+		print("Boolean conditioned edges:\n")
 	for key,value in booleans.items():
 		print(key+":")
 		for t in value:
@@ -307,11 +306,11 @@ def visualise_rules_grouping(main_group, is_source, rules, size_multiplier = 1):
 	edge_labels.pop((main_domain, main_domain), None)
 
 	make_graph(edge_labels, attribute_edges, 
-			   conditional_edges, main_domain, 1.2)
+			   conditional_edges, main_domain, size_multiplier)
 
 # edges -> dictionary {(pair_of_nodes):label}
 # colored_edges -> dictionary {group_name:[group_edges]}
-def make_graph(edges, colored_edges, dotted_edges, me, size_multiplier = 1):
+def make_graph(edges, colored_edges, dotted_edges, me, size_multiplier = 1.2):
 	G = nx.DiGraph()
 	#for (x,y) in edges.keys():
 	#	print(x + " - " + y)
