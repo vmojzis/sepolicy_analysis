@@ -197,7 +197,7 @@ def parse_cil_files(path):
 		types = set(types)
 		domains = types & subject_list
 		resources = types - domains
-		print(name,":",",".join(domains),":", ",".join(resources),sep="")
+		print(name,":",",".join(sorted(domains)),":", ",".join(sorted(resources)),sep="")
 
 # load domain groups from domain_groups_cil.conf file
 # and return them as ditionary {group_name:DomainGroup()}

@@ -16,9 +16,8 @@ def get_types_cil(path):
 	#get files in given directory
 	for (dirpath, dirnames, filenames) in os.walk(path):
 		# tuples (filename,full_file_path)
-
 		filepaths.extend(
-				((filename[:-4], os.path.join(dirpath, filename)) for filename in filenames 
+				((filename[:-4], os.path.join(dirpath, filename)) for filename in sorted(filenames)
 				if filename.endswith(".cil"))
 		)
 		break # don't go deeper
@@ -45,7 +44,7 @@ def get_types(file_path):
 		#Contains only 1 group that matches the type name
 		regexp = re.compile(r"\s*\(\s*type\s+([\w-]+)\s*\)\s*")
 
-		types = list()
+		types = []
 		for line in txt:
 			result = regexp.match(line)
 			if result:

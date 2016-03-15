@@ -1,11 +1,19 @@
-#!/bin/bash -x
+#!/bin/bash -vx
+
+if [ "$(id -u)" != "0" ]; then
+   echo "This script must be run as root" 1>&2
+   exit 1
+fi
+
 set -e
 # Any subsequent(*) commands which fail will cause the shell script to exit immediately
 
-# Copy this script into copy of /var/lib/selinux/targeted/active/modules/100/ directory and run
-# It will yield directory containing extracted cil files <module_name>.cil
-
+TOOL_FOLDER=$(pwd)
 FOLDER="__extracted"
+
+mkdir cil
+cd cil
+cp -R /var/lib/selinux/targeted/active/modules/100/* .
 
 mkdir $FOLDER
 
@@ -16,3 +24,11 @@ do
 		bzcat $i/cil > ./$FOLDER/$i.cil
 	fi
 done
+
+CIL_FILES=$(pwd)
+
+cd $TOOL_FOLDER
+
+python3 -c "import domain_grouping; domain_grouping.parse_cil_files('$CIL_FILES/$FOLDER')" > domain_groups_cil.conf
+
+rm -rf $CIL_FILES

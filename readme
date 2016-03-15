@@ -16,6 +16,21 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+Dependencies:
+	setools 4 (installed using python3)
+		
+		setuptools
+		libselinux (Python bindings optional but recommended)
+		python3
+		libbz2
+		bzip2-devel
+		setools
+		selinux-policy-devel
+		libsepol-static
+		python3-networkx
+		PyQt5 (only if using graphical tools)
+		python3-PyQt5
+
 Installation:
 	You need to have SETools v4 package (locally) installed including all dependencies.
 		- https://github.com/TresysTechnology/setools
@@ -25,10 +40,11 @@ Installation:
 		- "test_setools.py" contains example uses of implemented functionality
 	Visual query is available via visual_query.py (-h for usage)
 
-Domain grouping:
+	Recommended pdf viewer for visual_query output is Okular (fast, deep zoom)
+
+Domain grouping (Done automatically by extract_cil.sh):
 	* Get cil files from /var/lib/selinux/targeted/active/modules/100/<module_name>/cil, extract them,
 	  and save them in a directory as <module_name>.cil
-	  (Done by extract_cil.sh)
 	
 	* Run domain_grouping.parse_cil_files(path_cil_files) and save result to domain_groups_cil.conf
 	  (contains colon-separated triples "group_name:domain_types:resource_types")
