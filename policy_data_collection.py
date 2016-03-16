@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import selinux
 import sepolicy  
 
@@ -30,10 +30,39 @@ def half_expand_rule(rule, expand_source):
 			results.append(setools.policyrep.terule.expanded_te_rule_factory(rule, rule.source, t))
 	return results
 
-#print type(list(results)[0])
-#for item in results:
-	#print expand_attr(item)
-#	print item
+# return set of rules where attributes were replaced by all types with given attribute
+def expand_rule(rule):
+	results = []
+
+	source_exp = rule.source.expand() if is_attribute(rule.source) else [rule.source]
+	target_exp = rule.target.expand() if is_attribute(rule.target) else [rule.target]
+
+	for source in source_exp:
+		for target in target_exp:
+			if isinstance(rule, setools.policyrep.terule.ExpandedTERule):
+				#expanded_te_rule_factory ignores ExpandedTERules (doesn't set new source/target)
+				newrule = setools.policyrep.terule.ExpandedTERule(rule.policy, rule.qpol_symbol)
+				newrule.source = source
+				newrule.target = target
+				nwerule.origin = rule.origin
+
+			else:	
+				newrule = setools.policyrep.terule.expanded_te_rule_factory(rule, source, target)
+			results.append(newrule)
+
+	return results
+
+# expand all rules in given iterable
+def expand_rules(rules):
+	results = []
+
+	for rule in rules:
+		if (not is_attribute(rule.source)) and not (is_attribute(rule.target)):
+			results.append(rule)
+		else:
+			results.extend(expand_rule(rule))
+
+	return results
 
 # returns list of all attributes corresponding to given name
 # seinfo -a[name]
@@ -53,7 +82,7 @@ def get_attributes():
 # seinfo -t
 def get_types():
 	results = setools.SELinuxPolicy().types()
-	return [str(x) for x in results]
+	return [x for x in results]
 
 # returns list of types with "domain" attribute
 def get_domain_types():
@@ -61,13 +90,13 @@ def get_domain_types():
 	q.name = "domain"
 	results = next(q.results()) #should contain only 1 item - TypeAttribute("domain")
 	if results:
-		return [str(x) for x in results.expand()]
+		return [x for x in results.expand()]
 	else :
 		return []
 	
 # returns attributes of given type
 def get_attributes_of(type):
-	return [str(x) for x in type.expand()]
+	return [x for x in type.expand()]
 
 # returns attributes of given type
 def get_attributes_of_str(type_name):
@@ -138,16 +167,21 @@ def filter_terules_boolean(rules, bool_state = None):
 	results = []
 	for rule in rules:
 		try:
-			boolean = str(rule.conditional)
-			# get boolean setting (provided by "bool_state" dictionary, or get current value from active policy)
-			state = bool_state.get(boolean, selinux.security_get_boolean_active(boolean)) \
+			booleans = rule.conditional.booleans
+			
+			#get state of all booleans in the conditional expression
+			boolstate = {} 
+			for boolean in booleans:
+				boolean = str(boolean)
+				# get boolean setting (provided by "bool_state" dictionary, or get current value from active policy)
+				state = bool_state.get(boolean, selinux.security_get_boolean_active(boolean)) \
 					if bool_state else selinux.security_get_boolean_active(boolean)
- 
-			if rule.conditional_block == state:
+				boolstate[boolean] = state
+			#print(boolstate)
+
+			if rule.conditional.evaluate(**boolstate):
 				# return rules in agreement with boolean settings
 				results.append(rule)
-			#else:
-			#	print("Rule removed")
 
 		except setools.policyrep.exception.RuleNotConditional:
 			# return all unconditional rules

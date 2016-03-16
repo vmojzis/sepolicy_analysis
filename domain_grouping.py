@@ -142,10 +142,10 @@ def create_resource_groups(domain_groups, object_list):
 def get_unassigned_types():
 	domain_groups = group_types_name()
 
-	type_list = set([x[:-2].lower() for x in data.get_types()])
+	type_list = set([str(x)[:-2].lower() for x in data.get_types()])
 
 	#get types corresponding to "domains" - runnables
-	subject_list = set([x[:-2].lower() for x in data.get_domain_types()])
+	subject_list = set([str(x)[:-2].lower() for x in data.get_domain_types()])
 
 	object_list = sorted(type_list - subject_list)#, key=lambda s: s.lower())
 
@@ -165,10 +165,10 @@ def get_unassigned_types():
 # Scan system for domain and object types and group them by name separating subject and objects
 def group_types_name():
 	# get all type names and remove trailing "_t"
-	type_list = set([x[:-2].lower() for x in data.get_types()])
+	type_list = set([str(x)[:-2].lower() for x in data.get_types()])
 
 	#get types corresponding to "domains" - runnables
-	subject_list = set([x[:-2].lower() for x in data.get_domain_types()])
+	subject_list = set([str(x)[:-2].lower() for x in data.get_domain_types()])
 
 	object_list = sorted(type_list - subject_list)#, key=lambda s: s.lower())
 	type_list = sorted(type_list)#, key=lambda s: s.lower())
@@ -185,9 +185,9 @@ def group_types_name():
 # Results are printed to stdout (to be saved in domain_groups_cil.conf)
 def parse_cil_files(path):
 	# get all type
-	type_list = set([x for x in data.get_types()])
+	type_list = set([str(x) for x in data.get_types()])
 	#get types corresponding to "domains" - runnables
-	subject_list = set([x for x in data.get_domain_types()])
+	subject_list = set([str(x) for x in data.get_domain_types()])
 
 	object_list = type_list - subject_list
 

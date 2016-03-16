@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #egg_path='/home/vmojzis/DEVEL/selinux-policy/sepolicy_analysis/networkx-1.10-py3.4.egg'
 
@@ -12,16 +12,14 @@ import sepolicy
 
 G = nx.DiGraph()
 
-all_types = sepolicy.info(sepolicy.TYPE).
+all_types = sepolicy.info(sepolicy.TYPE)
 #"name"
 
+rules = sepolicy.search([sepolicy.ALLOW],{})
 
+print("\n".join([str(x) for x in rules]))
 
-
-
-
-
-
+'''
 me = 'init_t'
 # ?all? allow rules #print sepolicy.search(['allow']) rules =
 rules = sepolicy.search([sepolicy.ALLOW], {'source': me, 'permlist': ['write'], 'class': 'file'}) 
@@ -29,16 +27,17 @@ rules += sepolicy.search([sepolicy.ALLOW], {'target': me, 'permlist': ['write'],
 
 my_attributes = sepolicy.info(sepolicy.TYPE, me)[0]["attributes"]
 
+
 #print rules #all types #sepolicy.info(0) #print
 #sepolicy.info(sepolicy.TYPE)
-print my_attributes
+print(my_attributes)
 
 targets = [me]
 
 for i in rules:
 	if i['target'] not in targets:
 		targets.append(i['target'])
-print targets
+print(targets)
 
 for i in rules:
 	if i['target'] not in targets:
@@ -56,7 +55,7 @@ for i in rules:
 	
 	edges.append((source, target))
 
-print edges
+print(edges)
 
 #get all entrypoints
 #sepolicy.info(sepolicy.ATTRIBUTE, "entry_type")
@@ -68,7 +67,7 @@ print edges
 G.add_nodes_from(targets)
 G.add_edges_from(edges)
 
-print G
+print(G)
 #nx.draw(G)
 #nx.draw_random(G)
 
@@ -83,4 +82,4 @@ plt.show()
 #nx.write_dot(G,'file.dot')
 
 #export grahp to "trolo"
-#nx.write_graphml(G, "trolo")
+#nx.write_graphml(G, "trolo")'''
