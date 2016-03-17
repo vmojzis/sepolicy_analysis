@@ -14,6 +14,7 @@ if cmd_subfolder not in sys.path:
 import setools
 
 import policy_data_collection as data
+import domain_grouping as grouping
 
 from collections import defaultdict
 
@@ -26,7 +27,7 @@ def filter_non_domain(rules, domain_types_str):
 	return results
 
 
-q = setools.TERuleQuery(setools.SELinuxPolicy(),ruletype=["allow"]) #, perms=["execute"]
+q = setools.TERuleQuery(setools.SELinuxPolicy(),ruletype=["allow"], tclass=["file", "process"]) #, perms=["execute"]
 rules = q.results()
 rules = [x for x in rules]
 
@@ -46,11 +47,29 @@ G = nx.DiGraph()
 
 matrix = defaultdict(set)
 
-for rule in rules:
-	matrix[(str(rule.source), str(rule.target))] |= set(rule.perms)
+#domain grouping
+if True:
+	domain_grouping = grouping.group_types_cil()
+	#reversal of domain grouping - for fast inverse search
+	reverse_grouping = {}
+	for group in domain_grouping.values():
+		for _type in group.types:
+			reverse_grouping[_type] = group
+
+	for rule in rules:
+		source = str(rule.source)
+		#domain grouping
+		source = reverse_grouping.get(source, source)
+		target = str(rule.target)
+		target = reverse_grouping.get(target, target)
+		matrix[(source, target, str(rule.tclass))] |= set(rule.perms)
+else:
+	for rule in rules:
+		matrix[(str(rule.source), str(rule.target), str(rule.tclass))] |= set(rule.perms)
 
 print("edges")
-edges = [(key[0],key[1],{"perms":value}) for key,value in matrix.items()]
+
+edges = [(key[0],key[1],{key[2]:value}) for key,value in matrix.items()]
 #print("\n".join([str(x) for x in edges]))
 print("graph")
 G.add_edges_from(edges)

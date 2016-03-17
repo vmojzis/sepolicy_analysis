@@ -37,6 +37,22 @@ class DomainGroup(object):
 		self.domains = set()
 		self.resources = set()
 
+	def __hash__(self):
+		return hash(self.name)
+
+	def __eq__(self, other):
+		return self.name == other.name
+
+	def __str__(self):
+		return self.name
+
+	def __repr__(self):
+		#<domain_grouping.DomainGroup object at 0x7f67113ab390
+		return ("<" + self.__class__.__name__ + " object at " + hex(id(self)) + " " + self.name + ">")
+
+	def content_str(self):
+		return (self.name + ">>\n   " + ", ".join(self.domains) + "\n   " + ", ".join(self.resources))
+
 	@property
 	def types(self):
 		return self.domains | self.resources
@@ -46,9 +62,6 @@ class DomainGroup(object):
 
 	def add_resource(self, resource):
 		self.resources.add(resource)
-
-	def __str__(self):
-		return (self.name + ">>\n   " + ", ".join(self.domains) + "\n   " + ", ".join(self.resources))
 
 	#merge given domain group with self
 	def merge(group):
