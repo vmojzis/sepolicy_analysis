@@ -31,6 +31,7 @@ def find_type_transition_execution(G):
 			process_transitions[v].add(u)
 
 	results = set()
+	transitions = set()
 	execute_perms = set(["execute", "read", "open", "getattr"])
 	for target,sources in process_transitions.items():
 		#find "entrypoint" in target node successors
@@ -41,8 +42,26 @@ def find_type_transition_execution(G):
 					if(execute_perms.issubset(G.get_edge_data(source, succ, {}).get("file", {}))):
 						#found process transition form "source" to "target" via entrypoint "succ"
 						results.add((source, target, succ))
+						transitions.add((source, target))
 	#TODO > test this on ungroupped data !!!!!!!!!!!!
 
 	#print(process_transitions)
-	print(results)
+	#print("\n".join([str(x) for x in results]))
+	'''
 	print(sum([len(value) for value in process_transitions.values()]) , " > ", len(results))
+	transition = None
+	for target,sources in process_transitions.items():
+		transition = (target, sources)
+		break
+	print("TROLO")
+	print(transition)
+	for (source, target, entry) in results:
+		if source == [x for x in transition[1]][0] and target == transition[0]:
+			print(source, ", ", target, ", ", entry)
+	'''
+	suspicious = set()
+	for source,target in transitions:
+		if ("write" in G.get_edge_data(source,target, {}).get("file", {})):
+			suspicious.add((source,target))
+
+	print("\n".join([str(x) for x in suspicious]))

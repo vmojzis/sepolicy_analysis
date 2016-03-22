@@ -46,9 +46,13 @@ class DomainGroup(object):
 	def __str__(self):
 		return self.name
 
-	def __repr__(self):
+	'''def __repr__(self):
 		#<domain_grouping.DomainGroup object at 0x7f67113ab390
 		return ("<" + self.__class__.__name__ + " object at " + hex(id(self)) + " " + self.name + ">")
+	'''
+	def __repr__(self):
+		#<domain_grouping.DomainGroup object at 0x7f67113ab390
+		return (self.name)
 
 	def content_str(self):
 		return (self.name + ">>\n   " + ", ".join(self.domains) + "\n   " + ", ".join(self.resources))

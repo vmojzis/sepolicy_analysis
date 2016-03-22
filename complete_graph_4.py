@@ -48,7 +48,7 @@ G = nx.DiGraph()
 matrix = defaultdict(set)
 
 #domain grouping
-if True:
+if False:
 	domain_grouping = grouping.group_types_cil()
 	#reversal of domain grouping - for fast inverse search
 	reverse_grouping = {}
