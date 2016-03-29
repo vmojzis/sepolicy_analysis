@@ -28,7 +28,7 @@ def get_types_cil(path):
 		types = get_types(path)
 
 		if types:
-			results.append((filename, types))
+			results.append((filename.lower(), types))
 	return results
 
 
@@ -48,7 +48,7 @@ def get_types(file_path):
 		for line in txt:
 			result = regexp.match(line)
 			if result:
-				types.append(result.group(1))
+				types.append((result.group(1)).lower())
 		
 		return types
 

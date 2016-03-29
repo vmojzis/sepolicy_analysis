@@ -20,14 +20,9 @@ from collections import defaultdict
 
 
 
-file = open('data/rules_grouping_file_process.bin', 'rb')
-G_g = pickle.load(file)
-file.close()
-
 file = open('data/rules_file_process.bin', 'rb')
 G = pickle.load(file)
 file.close()
-
 #print("Edges> ", len(G.edges()), " nodes> ", len(G.nodes()))
 #print(G.edges(data=True)[0])
 #print(str(G.edges(data=True)[0][0]))
@@ -38,16 +33,6 @@ file.close()
 		break
 '''
 
-results, transitions = evaluation.find_type_transition_execution(G_g)
-'''
-for a,b,c in results:
-	if (str(a) == "accountsd") and (str(b) == "abrt") and (str(c) == "abrt"):
-		print("YEAH")
-		print(a.domains, "\n" ,b.domains, "\n" , c.types)
-		print(G_g.get_edge_data(a,b))
-		print(G_g.get_edge_data(b,c))
-		print(G_g.get_edge_data(a,c))
-'''
-results2 = evaluation.expand_type_transition_execution(G,transitions)
-#print(results-results2)
-print("\n".join([str(x) for x in results2]))
+results, suspicious = evaluation.find_type_transition_execution(G)
+
+print("\n".join([str(x) for x in results]))

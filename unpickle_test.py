@@ -15,6 +15,7 @@ import setools
 
 import policy_data_collection as data
 import evaluation_functions as evaluation
+import domain_grouping as grouping
 
 from collections import defaultdict
 
@@ -37,17 +38,24 @@ file.close()
 		print(edge)
 		break
 '''
-
-results, transitions = evaluation.find_type_transition_execution(G_g)
-'''
+#########################################
+domain_grouping = grouping.group_types_cil()
+#reversal of domain grouping - for fast inverse search
+reverse_grouping = {}
+for group in domain_grouping.values():
+	for _type in group.types:
+		reverse_grouping[_type] = group
+###########################################
+results_groupped = set()
+results, transitions = evaluation.find_type_transition_execution(G)
 for a,b,c in results:
-	if (str(a) == "accountsd") and (str(b) == "abrt") and (str(c) == "abrt"):
-		print("YEAH")
-		print(a.domains, "\n" ,b.domains, "\n" , c.types)
-		print(G_g.get_edge_data(a,b))
-		print(G_g.get_edge_data(b,c))
-		print(G_g.get_edge_data(a,c))
-'''
-results2 = evaluation.expand_type_transition_execution(G,transitions)
+	results_groupped.add((reverse_grouping[a], reverse_grouping[b], reverse_grouping[c]))
+
+results2, transitions = evaluation.find_type_transition_execution(G_g)
+
+print("\n".join([str(x) for x in (results_groupped - results2)]))
+
+#print(results_groupped)
+#results2 = evaluation.expand_type_transition_execution(G,transitions)
 #print(results-results2)
-print("\n".join([str(x) for x in results2]))
+#print("\n".join([str(x) for x in results2]))

@@ -27,7 +27,7 @@ def filter_non_domain(rules, domain_types_str):
 	return results
 
 
-q = setools.TERuleQuery(setools.SELinuxPolicy(),ruletype=["allow"], tclass=["file", "process"]) #, perms=["execute"]
+q = setools.TERuleQuery(setools.SELinuxPolicy(),ruletype=["allow"], tclass=["file", "process"])#, tclass=["file", "process"]) #, perms=["execute"]
 rules = q.results()
 rules = [x for x in rules]
 
@@ -48,7 +48,7 @@ G = nx.DiGraph()
 matrix = defaultdict(set)
 
 #domain grouping
-if False:
+if True:
 	domain_grouping = grouping.group_types_cil()
 	#reversal of domain grouping - for fast inverse search
 	reverse_grouping = {}
@@ -57,15 +57,15 @@ if False:
 			reverse_grouping[_type] = group
 
 	for rule in rules:
-		source = str(rule.source)
+		source = str(rule.source).lower()
 		#domain grouping
-		source = reverse_grouping.get(source, source)
-		target = str(rule.target)
-		target = reverse_grouping.get(target, target)
+		source = reverse_grouping.get(source, None)
+		target = str(rule.target).lower()
+		target = reverse_grouping.get(target, None)
 		matrix[(source, target, str(rule.tclass))] |= set(rule.perms)
 else:
 	for rule in rules:
-		matrix[(str(rule.source), str(rule.target), str(rule.tclass))] |= set(rule.perms)
+		matrix[(str(rule.source).lower(), str(rule.target).lower(), str(rule.tclass).lower())] |= set(rule.perms)
 
 print("edges")
 
@@ -75,7 +75,7 @@ print("graph")
 G.add_edges_from(edges)
 #rule.tclass
 
-file = open('rules_dump.bin','wb')
+file = open('data/rules_dump.bin','wb')
 print("writing")
 pickle.dump(G, file)
 file.close()

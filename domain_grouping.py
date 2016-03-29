@@ -14,7 +14,10 @@ import copy
 import policy_data_collection as data
 import policy_parser as pparse
 
-
+#Represents group of selinux types defined in the same package
+#domains - set of types with attrinbute "domain"
+#resources - non-domain types
+#Contains only type names (not the actual "type" object)! 
 class DomainGroup(object):
 	"""
 	Query the RBAC rules.
