@@ -31,7 +31,7 @@ q = setools.TERuleQuery(setools.SELinuxPolicy(),ruletype=["allow"], tclass=["fil
 rules = q.results()
 rules = [x for x in rules]
 
-#rules = data.filter_terules_boolean(rules)
+rules = data.filter_terules_boolean(rules)
 
 
 domain_types = data.get_domain_types()
@@ -62,6 +62,10 @@ if True:
 		source = reverse_grouping.get(source, None)
 		target = str(rule.target).lower()
 		target = reverse_grouping.get(target, None)
+		if source == None:
+			print("Failed to find group for: ", str(rule.source).lower())
+		if target == None:
+			print("Failed to find group for: ", str(rule.target).lower())
 		matrix[(source, target, str(rule.tclass))] |= set(rule.perms)
 else:
 	for rule in rules:

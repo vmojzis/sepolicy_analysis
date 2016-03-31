@@ -66,10 +66,10 @@ def expand_type_transition_execution(G, groupped_transitions):
 	suspicious = set()
 	for source,target,trans in results:
 		if ("write" in G.get_edge_data(source,trans, {}).get("file", {})):
-			suspicious.add((source,target))
+			suspicious.add((source,target,trans))
 
 	#print("\n".join([str(x) for x in suspicious]))
-	return results
+	return results, suspicious
 
 
 def find_type_transition_execution(G):
@@ -121,8 +121,60 @@ def find_type_transition_execution(G):
 
 	return results, transitions
 
+# For a dynamic transition (from A to B) to happen, the following has to be allowed
+# allow A B:process { dyntransition }; //transition is allowed to happen
+# allow A self:process { setcurrent }; //execution of the transition
+def find_dyntransitions_from(G, source):
+	results = set()
+	
+	for succ in G.successors_iter(source):
+		if "dyntransition" in (G.get_edge_data(source, succ, {}).get("process", {})) and
+			"setcurrent" in (G.get_edge_data(source, source, {}).get("process", {})):
+			results.add(succ)
+
+	return results
+
+# For a dynamic transition (from A to B) to happen, the following has to be allowed
+# allow A B:process { dyntransition }; //transition is allowed to happen
+# allow A self:process { setcurrent }; //execution of the transition
+def find_all_dyntransitions(G):
+	results = defaultdict(set)
+	
+	for (u, v, data) in G.edges_iter(data=True):
+		if dyntransition_perms.issubset(data.get("process", {})) and
+			"setcurrent" in (G.get_edge_data(u, u, {}).get("process", {})):
+			results[u].add(v)
+
+	return results
+
+# Find entrypoint 
+#def find_entrypoint_editing 
 
 # find domain types that can be executed by someone 
 # Types with attribute "domain" that are targets of "allow execute" rule
-def find_executable_domain_type(G):
-	pass
+#def find_executable_domain_type(G):
+#	pass
+
+#find entrypoints that can be written by someone (and corresponding domains to which these entrypoints lead)
+def find_writable_executables(G):
+	# will contain entrypoint labels as keys
+	# and sets of domains in which the process (spawned from given entrypoint) will run as values
+	execs = defaultdict(set)
+	#old networkx version !!!
+	#for (u, v, data) in G.edges_iter(data="process"):
+	execute_no_trans = set(["execute_no_trans", "read", "getattr"])
+	for (u, v, data) in G.edges_iter(data=True):
+		fileperms = data.get("file", {}))
+		if ("entrypoint" in fileperms) or 
+			(execute_no_trans.issubset(fileperms): #domain "u" can execute given file without transition
+			execs[v].add(u)
+
+	writable = defaultdict(set)
+	for key,value in execs.items():
+		#iterate over incomming edges of key (entrypoint)
+		for (u,v,data) in G.in_edges_iter([key],data=True):
+			if ("write" in data.get("file", {})):
+				writable[key].add(u)
+	#TODO return keys from writable - values will be from both writable and execs
+
+	return execs
