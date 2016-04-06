@@ -208,9 +208,9 @@ def group_types_name():
 # Results are printed to stdout (to be saved in domain_groups_cil.conf)
 def parse_cil_files(path):
 	# get all type
-	type_list = set([str(x) for x in data.get_types()])
+	type_list = set([str(x).lower() for x in data.get_types()])
 	#get types corresponding to "domains" - runnables
-	subject_list = set([str(x) for x in data.get_domain_types()])
+	subject_list = set([str(x).lower() for x in data.get_domain_types()])
 
 	object_list = type_list - subject_list
 

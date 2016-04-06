@@ -22,8 +22,8 @@ def expand_type_transition_execution(G, groupped_transitions):
 	process_transitions = defaultdict(set)
 	#print(groupped_transitions)
 	for source_g, target_g in groupped_transitions:
-		for source in source_g.types:
-			for target in target_g.types:
+		for source in source_g.domains:
+			for target in target_g.domains:
 				#if (source == "accountsd_t" and target == "abrt_helper_t"):
 				#		print("DAGFUQ?")
 				if ("transition" in G.get_edge_data(source, target, {}).get("process", {})):
@@ -31,25 +31,7 @@ def expand_type_transition_execution(G, groupped_transitions):
 
 
 	results = set()
-	transitions = set()
 
-	'''process_transitions2 = defaultdict(set)
-	#old networkx version !!!
-	#for (u, v, data) in G.edges_iter(data="process"):
-	for (u, v, data) in G.edges_iter(data=True):
-		#print(u, " ", v, " ",data)
-		if ("transition" in data.get("process", {})):
-			process_transitions2[v].add(u)
-
-	for key,value in process_transitions2.items():
-		value2 = process_transitions.get(key, None)
-		if (not value2):
-			print(key)
-		if value not in value2:
-			print(value, "\n", value2)
-	#sys.exit()
-	#print("\n".join([str(x) for x in (process_transitions - process_transitions2)]))
-	'''
 	execute_perms = set(["execute", "read", "getattr"])
 	for target,sources in process_transitions.items():
 		#find "entrypoint" in target node successors
@@ -61,16 +43,46 @@ def expand_type_transition_execution(G, groupped_transitions):
 					if(execute_perms.issubset(G.get_edge_data(source, succ, {}).get("file", {}))):
 						#found process transition form "source" to "target" via entrypoint "succ"
 						results.add((source, target, succ))
-						transitions.add((source, target))
 
 	suspicious = set()
 	for source,target,trans in results:
 		if ("write" in G.get_edge_data(source,trans, {}).get("file", {})):
 			suspicious.add((source,target,trans))
 
-	#print("\n".join([str(x) for x in suspicious]))
-	return results, suspicious
+	return suspicious
 
+# find type_transition_execution first using groupped graph
+# and then expand them using full graph -- speed comparison to direct search in full graph
+# G - full graph
+# G_G - groupped graph
+def find_type_transition_execution_uing_groups(G, G_G):
+	process_transitions = defaultdict(set)
+	#old networkx version !!!
+	#for (u, v, data) in G.edges_iter(data="process"):
+	for (u, v, data) in G_G.edges_iter(data=True):
+		#print(u, " ", v, " ",data)
+		if ("transition" in data.get("process", {})):
+			process_transitions[v].add(u)
+
+	results = set()
+	
+	execute_perms = set(["execute", "read", "getattr"])
+	for target,sources in process_transitions.items():
+		#find "entrypoint" in target node successors
+		for succ in G_G.successors_iter(target):
+			if ("entrypoint" in G_G.get_edge_data(target, succ, {}).get("file", {})):
+				#test if sources have "execute" permissions on entrypoint
+				for source in sources:
+					if(execute_perms.issubset(G_G.get_edge_data(source, succ, {}).get("file", {}))):
+						#found process transition form "source" to "target" via entrypoint "succ"
+						results.add((source, target, succ))
+
+	write_exec = set()
+	for source,target,entry in results:
+		if ("write" in G_G.get_edge_data(source,entry, {}).get("file", {})):
+			write_exec.add((source,target))
+
+	return expand_type_transition_execution(G, write_exec)
 
 def find_type_transition_execution(G):
 	#get process transition edges
@@ -96,30 +108,13 @@ def find_type_transition_execution(G):
 						#found process transition form "source" to "target" via entrypoint "succ"
 						results.add((source, target, succ))
 						transitions.add((source, target))
-	#TODO > test this on ungroupped data !!!!!!!!!!!!
 
-	#print(process_transitions)
-	#print("\n".join([str(x) for x in results]))
-	'''
-	print(sum([len(value) for value in process_transitions.values()]) , " > ", len(results))
-	transition = None
-	for target,sources in process_transitions.items():
-		transition = (target, sources)
-		break
-	print("TROLO")
-	print(transition)
-	for (source, target, entry) in results:
-		if source == [x for x in transition[1]][0] and target == transition[0]:
-			print(source, ", ", target, ", ", entry)
-	'''
 	suspicious = set()
 	for source,target,entry in results:
 		if ("write" in G.get_edge_data(source,entry, {}).get("file", {})):
 			suspicious.add((source,target,entry))
 
-	#print("\n".join([str(x) for x in suspicious]))
-
-	return results, transitions
+	return suspicious
 
 # For a dynamic transition (from A to B) to happen, the following has to be allowed
 # allow A B:process { dyntransition }; //transition is allowed to happen
@@ -128,8 +123,8 @@ def find_dyntransitions_from(G, source):
 	results = set()
 	
 	for succ in G.successors_iter(source):
-		if "dyntransition" in (G.get_edge_data(source, succ, {}).get("process", {})) and
-			"setcurrent" in (G.get_edge_data(source, source, {}).get("process", {})):
+		if ("dyntransition" in (G.get_edge_data(source, succ, {}).get("process", {})) and
+			"setcurrent" in (G.get_edge_data(source, source, {}).get("process", {}))):
 			results.add(succ)
 
 	return results
@@ -141,8 +136,8 @@ def find_all_dyntransitions(G):
 	results = defaultdict(set)
 	
 	for (u, v, data) in G.edges_iter(data=True):
-		if dyntransition_perms.issubset(data.get("process", {})) and
-			"setcurrent" in (G.get_edge_data(u, u, {}).get("process", {})):
+		if (dyntransition_perms.issubset(data.get("process", {})) and
+			"setcurrent" in (G.get_edge_data(u, u, {}).get("process", {}))):
 			results[u].add(v)
 
 	return results
@@ -164,9 +159,9 @@ def find_writable_executables(G):
 	#for (u, v, data) in G.edges_iter(data="process"):
 	execute_no_trans = set(["execute_no_trans", "read", "getattr"])
 	for (u, v, data) in G.edges_iter(data=True):
-		fileperms = data.get("file", {}))
-		if ("entrypoint" in fileperms) or 
-			(execute_no_trans.issubset(fileperms): #domain "u" can execute given file without transition
+		fileperms = data.get("file", {})
+		if (("entrypoint" in fileperms) or 
+			execute_no_trans.issubset(fileperms)): #domain "u" can execute given file without transition
 			execs[v].add(u)
 
 	writable = defaultdict(set)
@@ -175,6 +170,7 @@ def find_writable_executables(G):
 		for (u,v,data) in G.in_edges_iter([key],data=True):
 			if ("write" in data.get("file", {})):
 				writable[key].add(u)
+
 	#TODO return keys from writable - values will be from both writable and execs
 
-	return execs
+	return writable

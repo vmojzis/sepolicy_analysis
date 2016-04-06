@@ -27,7 +27,7 @@ def filter_non_domain(rules, domain_types_str):
 	return results
 
 
-q = setools.TERuleQuery(setools.SELinuxPolicy(),ruletype=["allow"], tclass=["file", "process"])#, tclass=["file", "process"]) #, perms=["execute"]
+q = setools.TERuleQuery(setools.SELinuxPolicy(),ruletype=["allow"] )#, tclass=["file", "process"])#, tclass=["file", "process"]) #, perms=["execute"]
 rules = q.results()
 rules = [x for x in rules]
 
