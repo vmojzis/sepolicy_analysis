@@ -21,9 +21,9 @@ from collections import defaultdict
 
 
 
-file = open('data/rules_grouping_file_process.bin', 'rb')
-G_g = pickle.load(file)
-file.close()
+#file = open('data/rules_grouping_file_process.bin', 'rb')
+#G_g = pickle.load(file)
+#file.close()
 
 file = open('data/rules_file_process.bin', 'rb')
 G = pickle.load(file)
@@ -39,23 +39,26 @@ file.close()
 		break
 '''
 #########################################
-domain_grouping = grouping.group_types_cil()
+#domain_grouping = grouping.group_types_cil()
 #reversal of domain grouping - for fast inverse search
-reverse_grouping = {}
-for group in domain_grouping.values():
-	for _type in group.types:
-		reverse_grouping[_type] = group
+#reverse_grouping = {}
+#for group in domain_grouping.values():
+#	for _type in group.types:
+#		reverse_grouping[_type] = group
 ###########################################
-results_groupped = set()
-results, transitions = evaluation.find_type_transition_execution(G)
-for a,b,c in results:
-	results_groupped.add((reverse_grouping[a], reverse_grouping[b], reverse_grouping[c]))
+#results_groupped = set()
+#results = evaluation.find_type_transition_execution(G)
+#for a,b,c in results:
+#	results_groupped.add((reverse_grouping[a], reverse_grouping[b], reverse_grouping[c]))
 
-results2, transitions = evaluation.find_type_transition_execution(G_g)
-
-print("\n".join([str(x) for x in (results_groupped - results2)]))
-
-#print(results_groupped)
+#results2, transitions = evaluation.find_type_transition_execution(G_g)
+#results = evaluation.find_dyntransitions_from(G, "sshd_t") 
+results = evaluation.find_dyntransitions_from(G, "sshd_t") 
+results = evaluation.find_edges_permission_set_from(G, ["sshd_t", "preupgrade_t","xserver_t"], "process", ["dyntransition"])
+print("\n".join([str((x,y)) for (x,y) in (results.items())]))
+#print ("\n".join([str(x) for x in results]))
+#print(G.get_edge_data("sshd_t", "sysadm_t", {})) 
+#print(results_groupped) 
 #results2 = evaluation.expand_type_transition_execution(G,transitions)
 #print(results-results2)
 #print("\n".join([str(x) for x in results2]))

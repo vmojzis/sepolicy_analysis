@@ -18,6 +18,7 @@ import domain_grouping as grouping
 
 from collections import defaultdict
 
+
 #filter out rules with non-domain source type (type without "domain" attribute)
 def filter_non_domain(rules, domain_types_str):
 	results = []
@@ -26,65 +27,76 @@ def filter_non_domain(rules, domain_types_str):
 			results.append(rule)
 	return results
 
+# build graph using all selinux rules in the system and save it to "filename"
+def build_graph(group_domains = False, filename = "data/rules_dump.bin", tclass = None):
 
-q = setools.TERuleQuery(setools.SELinuxPolicy(),ruletype=["allow"] )#, tclass=["file", "process"])#, tclass=["file", "process"]) #, perms=["execute"]
-rules = q.results()
-rules = [x for x in rules]
+	q = setools.TERuleQuery(setools.SELinuxPolicy(),ruletype=["allow"], tclass = tclass)#, tclass=["file", "process"])#, tclass=["file", "process"]) #, perms=["execute"]
+	rules = q.results()
+	rules = [x for x in rules]
 
-rules = data.filter_terules_boolean(rules)
+	rules = data.filter_terules_boolean(rules)
 
-
-domain_types = data.get_domain_types()
-domain_types_str = set([str(x) for x in domain_types])
-print("expanding")
-rules = data.expand_rules(rules)
-print("filtering")
-rules = filter_non_domain(rules, domain_types_str)
-
-
-print("matrix")
-G = nx.DiGraph()
-
-matrix = defaultdict(set)
-
-#domain grouping
-if True:
-	domain_grouping = grouping.group_types_cil()
-	#reversal of domain grouping - for fast inverse search
-	reverse_grouping = {}
-	for group in domain_grouping.values():
-		for _type in group.types:
-			reverse_grouping[_type] = group
-
-	for rule in rules:
-		source = str(rule.source).lower()
-		#domain grouping
-		source = reverse_grouping.get(source, None)
-		target = str(rule.target).lower()
-		target = reverse_grouping.get(target, None)
-		if source == None:
-			print("Failed to find group for: ", str(rule.source).lower())
-		if target == None:
-			print("Failed to find group for: ", str(rule.target).lower())
-		matrix[(source, target, str(rule.tclass))] |= set(rule.perms)
-else:
-	for rule in rules:
-		matrix[(str(rule.source).lower(), str(rule.target).lower(), str(rule.tclass).lower())] |= set(rule.perms)
-
-print("edges")
-
-edges = [(key[0],key[1],{key[2]:value}) for key,value in matrix.items()]
-#print("\n".join([str(x) for x in edges]))
-print("graph")
-G.add_edges_from(edges)
-#rule.tclass
-
-file = open('data/rules_dump.bin','wb')
-print("writing")
-pickle.dump(G, file)
-file.close()
+	domain_types = data.get_domain_types()
+	domain_types_str = set([str(x) for x in domain_types])
+	print("\tExpanding rules (attributes -> corresponding types)")
+	rules = data.expand_rules(rules)
+	print("\tFiltering (non-domain source, boolean settings,...)")
+	rules = filter_non_domain(rules, domain_types_str)
 
 
+	print("\tConstructing graph matrix")
+	G = nx.DiGraph()
+
+	matrix = defaultdict(set)
+
+	#domain grouping
+	if group_domains:
+		domain_grouping = grouping.group_types_cil()
+		#reversal of domain grouping - for fast inverse search
+		reverse_grouping = {}
+		for group in domain_grouping.values():
+			for _type in group.types:
+				reverse_grouping[_type] = group
+
+		for rule in rules:
+			source = str(rule.source).lower()
+			#domain grouping
+			source = reverse_grouping.get(source, None)
+			target = str(rule.target).lower()
+			target = reverse_grouping.get(target, None)
+			if source == None:
+				print("Failed to find group for: ", str(rule.source).lower())
+				print("domain_groups_cil.conf is probably outdated. Please run extract_cil.sh.")
+			if target == None:
+				print("Failed to find group for: ", str(rule.target).lower())
+				print("domain_groups_cil.conf is probably outdated. Please run extract_cil.sh.")
+			#TODO - create "default" group for not-assigned types
+			matrix[(source, target, str(rule.tclass))] |= set(rule.perms)
+	else:
+		for rule in rules:
+			matrix[(str(rule.source).lower(), str(rule.target).lower(), str(rule.tclass).lower())] |= set(rule.perms)
+
+	print("\tTransforming to adjacency list")
+
+	edges = [(key[0],key[1],{key[2]:value}) for key,value in matrix.items()]
+	#print("\n".join([str(x) for x in edges]))
+	print("\tAssembling graph")
+	G.add_edges_from(edges)
+	#rule.tclass
+
+	file = open(filename, 'wb')
+	print("\tSaving resulting graph")
+	pickle.dump(G, file)
+	file.close()
+
+def build_basic_graphs():
+	print(">>> Building graph. tclass = [file, process]")
+	build_graph(False, filename = "data/rules_file_process.bin",tclass = ["file", "process"])
+	print(">>> Building groupped graph. tclass = [file, process]")
+	build_graph(True, filename = "data/rules_grouping_file_process.bin",tclass = ["file", "process"])
+	print(">>> Done")
+
+build_basic_graphs()
 #G[1][3]['color']='blue'
 
 #rules = set([str(x) for x in rules])
@@ -97,10 +109,10 @@ file.close()
 for rule in rules:
 	if (not data.is_attribute(rule.source)) and (str(rule.source) not in domain_types):
 		print(rule)
-'''
 
 max_ = 0
 maxtype = "NOT_FOUND"
+'''
 
 
 

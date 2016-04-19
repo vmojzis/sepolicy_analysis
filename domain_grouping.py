@@ -244,6 +244,18 @@ def group_types_cil():
 	except IOError as e:
 		return {}
 
+#get types from given groups 
+# returns (domains, resources)
+def get_types(groups):
+	domains = set()
+	resources = set()
+
+	for group in groups:
+		domains |= group.domains
+		resources |= group.resources
+
+	return (domains, resources)
+
 	#return domain_groups #, create_resource_groups(domain_groups, object_list)
 
 #print subject_name(sys.argv[1], object_list)

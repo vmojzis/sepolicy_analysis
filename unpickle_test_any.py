@@ -58,7 +58,7 @@ results = evaluation.find_type_transition_execution(G)
 #print(results_groupped)
 results2 = evaluation.find_type_transition_execution_uing_groups(G,G_g)
 
-print("\n".join([str(x) for x in (results)]))
+print("\n".join([str(x) for x in (results2-results)]))
 
 #print(results-results2)
 #print("\n".join([str(x) for x in results2]))
