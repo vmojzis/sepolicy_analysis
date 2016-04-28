@@ -18,13 +18,15 @@ def parse_bool_config(bool_arg):
 	bool_config = {}
 	for boolean in bool_arg.split(","):
 		b = boolean.split(":")
-		if len(b) == 2:
+		if len(b) >= 2:
 			bool_config[b[0]] = (b[1] == "on")
 	#print("Bool config:\n", bool_config, "\n", bool_arg)
 	return bool_config
 
 
-parser = argparse.ArgumentParser(description='SELinux policy analysis tool.')
+parser = argparse.ArgumentParser(description='SELinux policy visual query tool.')
+
+parser.add_argument("policy", help="Path to the SELinux policy to be used.", nargs="?")
 
 search = parser.add_argument_group("Rule search (simillar to sesearch)")
 
@@ -96,6 +98,7 @@ if args.target_group:
 	args.target = args.target_group
 args.main_domain = args.source if args.source else args.target
 
+data.policy_init(args.policy)
 
 '''
 if args.tclass:

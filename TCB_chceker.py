@@ -43,7 +43,10 @@ def get_transitions(G, TCB):
 
 	return TCB_additions
 
-TCB_names = {"application", "authlogin", "clock", "fstools", "getty", "hostname", "hotplug", "init", "ipsec", "iptables", "kdbus", "libraries", "locallogin", "logging", "lvm", "miscfiles", "modutils", "mount", "netlabel", "selinuxutil", "setrans", "sysnetwork", "systemd", "udev", "unconfined", "userdomain", "bootloader", "consoletype", "dmesg", "netutils", "sudo", "su", "usermanage", "seunshare", "base"}
+TCB_names = {"init" ,"authlogin", "fstools", "getty", "hostname", "ipsec", "iptables", "libraries", "locallogin", "logging", "lvm", "miscfiles", "modutils", "mount", "netlabel", "selinuxutil", "setrans", "sysnetwork", "systemd", "udev", "bootloader", "dmesg", "netutils", "sudo", "su", "usermanage", "seunshare", "sysadm", "base"}
+'''"clock",
+"hostname", ???
+'''
 
 '''file = open('data/rules_grouping_file_process.bin', 'rb')
 G_g = pickle.load(file)
@@ -65,9 +68,20 @@ for name in TCB_names:
 	#else:
 	#	print("Could not find: " + name)
 
-
-
 TCB_domains, TCB_resources = grouping.get_types(TCB)
+
+TCB_domains |= set(["init_t"])
+TCB_resources |= set(["init_exec_t","init_tmp_t","init_var_lib_t","init_var_run_t","initctl_t","machineid_t"])
+TCB_exclude = set(["unlabeled_t", "initrc_t", "initrc_devpts_t", "initrc_exec_t", "initrc_state_t", "initrc_tmp_t", "initrc_var_log_t", "initrc_var_run_t"])
+
+
+
+TCB_domains = TCB_domains - TCB_exclude
+TCB_resources = TCB_resources - TCB_exclude
+
+
+
+TCB_all = TCB_domains | TCB_resources
 new = get_transitions(G, TCB_domains)
 #print(TCB_domains)
 print(new)
@@ -81,14 +95,16 @@ non_entry = TCB_resources - entrypoints
 # important !!!
 #print("\n".join([x + " > " + ", ".join(entrypoints_dict[x]) for x in entrypoints-TCB_resources]))
 
-print([x for x in non_entry if "exec_t" in x])
-'''writes,tcb_writes = get_writes_to(TCB_resources)
+#print("\n".join(entrypoints & TCB_resources))
+#print([x for x in non_entry if "exec_t" in x])
+writes,tcb_writes = get_writes_to(TCB_all ) # & entrypoints)
 
 #print results sorted according to "value" length
 for key,value in sorted(writes.items(), key=lambda x: len(x[1])):
-	print(key+":")
-	print("\t" + ", ".join(value))
-	'''
+	if key not in TCB_all:
+		print(key+":")
+		print("\t" + ", ".join(value))
+	
 #esults, transitions = evaluation.find_type_transition_execution(G_g)
 
 #results2, suspicious = evaluation.expand_type_transition_execution(G,transitions)

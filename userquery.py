@@ -88,22 +88,22 @@ class UserQuery:
 					print(type_, ", ", end="", sep="", flush=True)
 					source = type_ if self.qargs.source else None
 					target = type_ if self.qargs.target else None
-					rules += data.get_type_enf_rules(_ruletype = ["allow"],
-												    _source = source,
-												    _target = target, 
-												    _tclass = self.qargs.tclass,
-													_perms = self.qargs.perms,
-													_booleans = self.qargs.boolean
+					rules += data.get_type_enf_rules(ruletype = ["allow"],
+												    source = source,
+												    target = target, 
+												    tclass = self.qargs.tclass,
+													perms = self.qargs.perms,
+													booleans = self.qargs.boolean
 												    )
 				print("\n")
 		# source/target is single type
 		if not (self.qargs.source_group or self.qargs.target_group):
-			rules = data.get_type_enf_rules(_ruletype = ["allow"],
-							    _source = self.qargs.source,
-							    _target = self.qargs.target, 
-							    _tclass = self.qargs.tclass,
-								_perms = self.qargs.perms,
-								_booleans = self.qargs.boolean
+			rules = data.get_type_enf_rules(ruletype = ["allow"],
+							    source = self.qargs.source,
+							    target = self.qargs.target, 
+							    tclass = self.qargs.tclass,
+								perms = self.qargs.perms,
+								booleans = self.qargs.boolean
 							    )
 		return rules
 
@@ -171,12 +171,12 @@ class UserQuery:
 		for type_ in main_group.types:
 			source = type_ if self.qargs.source else None
 			target = type_ if self.qargs.target else None
-			rules += data.get_type_enf_rules(_ruletype = ["allow"],
-										    _source = source,
-										    _target = target, 
-										    _tclass = self.qargs.tclass,
-											_perms = self.qargs.perms,
-											_booleans = self.qargs.boolean
+			rules += data.get_type_enf_rules(ruletype = ["allow"],
+										    source = source,
+										    target = target, 
+										    tclass = self.qargs.tclass,
+											perms = self.qargs.perms,
+											booleans = self.qargs.boolean
 										    )
 
 		# filtering

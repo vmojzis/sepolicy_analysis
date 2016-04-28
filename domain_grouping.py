@@ -163,6 +163,8 @@ def create_resource_groups(domain_groups, object_list):
 
 #returns list of types not assigned to any domain group
 def get_unassigned_types():
+	data.policy_init()
+	
 	domain_groups = group_types_name()
 
 	type_list = set([str(x)[:-2].lower() for x in data.get_types()])
@@ -187,6 +189,8 @@ def get_unassigned_types():
 
 # Scan system for domain and object types and group them by name separating subject and objects
 def group_types_name():
+	data.policy_init()
+	
 	# get all type names and remove trailing "_t"
 	type_list = set([str(x)[:-2].lower() for x in data.get_types()])
 
@@ -207,7 +211,8 @@ def group_types_name():
 # according to cil module files located in "path"
 # Results are printed to stdout (to be saved in domain_groups_cil.conf)
 def parse_cil_files(path):
-	# get all type
+	data.policy_init()
+	# get all types
 	type_list = set([str(x).lower() for x in data.get_types()])
 	#get types corresponding to "domains" - runnables
 	subject_list = set([str(x).lower() for x in data.get_domain_types()])

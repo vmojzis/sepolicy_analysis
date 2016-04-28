@@ -11,17 +11,6 @@ if cmd_subfolder not in sys.path:
 import setools
 #import setools.policyrep
 
-__selinuxPolicy__ = None
-
-# load security policy (from given path or the one loaded in the system)
-# !!!!!!! This function has to be called before using this module !!!!!!!!!!
-def policy_init(policyPath = None):
-	global __selinuxPolicy__
-
-	__selinuxPolicy__ = setools.SELinuxPolicy(policyPath)
-
-
-
 def expand_attr(attr):
     """Render type and role attributes."""
     items = "\n\t".join(sorted(str(i) for i in attr.expand()))
@@ -78,7 +67,7 @@ def expand_rules(rules):
 # returns list of all attributes corresponding to given name
 # seinfo -a[name]
 def get_attributes_filter_name(name):
-	q = setools.TypeAttributeQuery(__selinuxPolicy__)
+	q = setools.TypeAttributeQuery(setools.SELinuxPolicy())
 	q.name = name
 	results = q.results()
 	return [str(x) for x in results]
@@ -86,18 +75,18 @@ def get_attributes_filter_name(name):
 # returns list of all attributes in loaded policy
 # seinfo -a
 def get_attributes():
-	results = __selinuxPolicy__.typeattributes()
+	results = setools.SELinuxPolicy().typeattributes()
 	return [str(x) for x in results]
 
 # returns list of all types in loaded policy
 # seinfo -t
 def get_types():
-	results = __selinuxPolicy__.types()
+	results = setools.SELinuxPolicy().types()
 	return [x for x in results]
 
 # returns list of types with "domain" attribute
 def get_domain_types():
-	q = setools.TypeAttributeQuery(__selinuxPolicy__)
+	q = setools.TypeAttributeQuery(setools.SELinuxPolicy())
 	q.name = "domain"
 	results = next(q.results()) #should contain only 1 item - TypeAttribute("domain")
 	if results:
@@ -106,7 +95,7 @@ def get_domain_types():
 		return []
 
 def get_unconfined_types():
-	q = setools.TypeAttributeQuery(__selinuxPolicy__)
+	q = setools.TypeAttributeQuery(setools.SELinuxPolicy())
 	q.name = "domain"
 	results = next(q.results()) #should contain only 1 item - TypeAttribute("domain")
 	if results:
@@ -121,7 +110,17 @@ def get_attributes_of(type):
 
 # returns attributes of given type
 def get_attributes_of_str(type_name):
-	q = setools.TypeQuery(__selinuxPolicy__)
+	q = setools.TypeQuery(setools.SELinuxPolicy())
+	q.name = type_name
+	results = []
+	for item in q.results():
+		# return attributes of all types corresponding to given name
+		results.extend([str(x) for x in item.attributes()]) 
+	return results
+
+# returns attributes of given type
+def get_attributes_of_str(type_name, policyPath):
+	q = setools.TypeQuery(setools.SELinuxPolicy(policyPath))
 	q.name = type_name
 	results = []
 	for item in q.results():
@@ -130,9 +129,10 @@ def get_attributes_of_str(type_name):
 	return results
 
 
+
 # returns types that have given attribute (specified by name)
 def get_types_of_str(attr_name):
-	q = setools.TypeAttributeQuery(__selinuxPolicy__)
+	q = setools.TypeAttributeQuery(setools.SELinuxPolicy())
 	q.name = attr_name
 	results = q.results().next() #should contain only 1 item - TypeAttribute("domain")
 	if results:
@@ -152,25 +152,25 @@ def get_types_of(attr):
 # perms -> list of permissions (rules containing at least one of the permissions)
 # booleans -> list of booleans
 # returns generator for TERule objects
-def get_type_enf_rules(ruletype = ["allow"],
-					   source = None, 
-					   target = None, 
-					   tclass = None, 
-					   perms = None, 
-					   booleans = None, 
-					   source_indirect = True, 
-					   target_indirect = True):
+def get_type_enf_rules(_ruletype = ["allow"],
+					   _source = None, 
+					   _target = None, 
+					   _tclass = None, 
+					   _perms = None, 
+					   _booleans = None, 
+					   _source_indirect = True, 
+					   _target_indirect = True):
 
 	try:
-		q = setools.TERuleQuery(__selinuxPolicy__,
-	                            ruletype=ruletype,
-	                            source=source,
-	                            source_indirect=source_indirect,
-	                            target=target,
-	                            target_indirect=target_indirect,
-	                            tclass = tclass,
-	                            perms = perms,
-	                            boolean = booleans)
+		q = setools.TERuleQuery(setools.SELinuxPolicy(),
+	                            ruletype=_ruletype,
+	                            source=_source,
+	                            source_indirect=_source_indirect,
+	                            target=_target,
+	                            target_indirect=_target_indirect,
+	                            tclass = _tclass,
+	                            perms = _perms,
+	                            boolean = _booleans)
 		#return [str(x) for x in q.results()]
 
 		# rule.conditional_block meaning (guessing):
@@ -216,7 +216,7 @@ def get_booleans():
 	#TODO: determine boolean values based on user*defined config file
 	bools = {}
 	# boolean.state contains default setting of the boolean
-	for boolean in __selinuxPolicy__.bools():
+	for boolean in setools.SELinuxPolicy().bools():
 		# get current setting of given boolean
 		bools[str(boolean)] = selinux.security_get_boolean_active(str(boolean)) == 1
 	return bools
@@ -243,11 +243,13 @@ def make_expanded_rule(original_rule, source, target):
 	return setools.policyrep.terule.expanded_te_rule_factory(original_rule, source, target)
 
 
+print(get_attributes_of_str("init_t", "/home/vmojzis/sepolicy_analysis/testing/policy_25.29"))
+
 #print "Attribute count: " + str(len(get_all_attributes()))
-#print "Type count: " + str(sum(1 for _ in __selinuxPolicy__.types()))
+#print "Type count: " + str(sum(1 for _ in setools.SELinuxPolicy().types()))
 #print get_types()
 #print "\n".join(get_domain_types())
 
 
 
-# __selinuxPolicy__.typeattributes()
+# setools.SELinuxPolicy().typeattributes()
