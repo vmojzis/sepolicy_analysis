@@ -5,18 +5,40 @@ import sepolicy
 import pickle
 import networkx as nx
 
-import os, sys, inspect
-# use this if you want to include modules from a subfolder
-cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"setools")))
-if cmd_subfolder not in sys.path:
-    sys.path.insert(0, cmd_subfolder)
-
-import setools
-
 import policy_data_collection as data
 import evaluation_functions as evaluation
+import argparse
+import domain_grouping as grouping
 
-from collections import defaultdict
+
+parser = argparse.ArgumentParser(description='SELinux policy analysis tool - graph query.')
+
+parser.add_argument("filename", help="Policy graph file.")
+
+parser.add_argument("policy", help="Path to the SELinux policy to be used.", nargs="?")
+
+
+args = parser.parse_args()
+
+# split list attributes
+if args.classes:
+	args.classes = args.classes.split(",")
+
+if args.filter_bools != None:
+	args.filter_bools = builder.parse_bool_config(args.filter_bools)
+
+builder.build_graph(args.policy, args.domain_grouping, args.filename, args.classes, args.filter_bools)
+
+
+
+methodToCall = getattr(evaluation, 'bar')
+result = methodToCall()
+
+
+
+
+
+
 
 
 

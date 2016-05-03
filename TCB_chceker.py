@@ -18,6 +18,7 @@ import evaluation_functions as evaluation
 import domain_grouping as grouping
 
 from collections import defaultdict
+import security_related as security
 
 
 def get_writes_to(TCB):
@@ -57,34 +58,13 @@ G = pickle.load(file)
 file.close()
 
 
-domain_grouping = grouping.group_types_cil()
-
-TCB = set()
-
-for name in TCB_names:
-	group = domain_grouping.get(name, None)
-	if group:
-		TCB.add(group)
-	#else:
-	#	print("Could not find: " + name)
-
-TCB_domains, TCB_resources = grouping.get_types(TCB)
-
-TCB_domains |= set(["init_t"])
-TCB_resources |= set(["init_exec_t","init_tmp_t","init_var_lib_t","init_var_run_t","initctl_t","machineid_t"])
-TCB_exclude = set(["unlabeled_t", "initrc_t", "initrc_devpts_t", "initrc_exec_t", "initrc_state_t", "initrc_tmp_t", "initrc_var_log_t", "initrc_var_run_t"])
-
-
-
-TCB_domains = TCB_domains - TCB_exclude
-TCB_resources = TCB_resources - TCB_exclude
-
-
+TCB_domains, TCB_resources = security.get_security_types()
 
 TCB_all = TCB_domains | TCB_resources
-new = get_transitions(G, TCB_domains)
+#new = get_transitions(G, TCB_domains)
 #print(TCB_domains)
-print(new)
+#print(new)
+
 
 entrypoints_dict = evaluation.find_entrypoints_to(G,TCB_domains)
 entrypoints = set(entrypoints_dict.keys())

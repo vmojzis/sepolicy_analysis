@@ -2,19 +2,7 @@
 import selinux
 import sepolicy  
 
-import pickle
 import networkx as nx
-
-import os, sys, inspect
-# include "setools 4" from subfolder "setools"
-cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"setools")))
-if cmd_subfolder not in sys.path:
-    sys.path.insert(0, cmd_subfolder)
-
-import setools
-
-import policy_data_collection as data
-import domain_grouping as grouping
 
 from collections import defaultdict
 
