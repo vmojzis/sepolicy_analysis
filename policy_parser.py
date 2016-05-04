@@ -54,4 +54,3 @@ def get_types(file_path):
 
 	except IOError as e:
 		return []
-

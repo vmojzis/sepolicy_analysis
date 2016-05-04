@@ -190,6 +190,9 @@ def find_writable_executables(G):
 	return writable
 
 #################################### General search functions for assembling user defined queries ##################################333
+def get_security_related():
+	pass
+
 
 # find graph edges containing given permission set (for given target object class)
 # returns dictionary indexed by sources, with sets of targets as values
@@ -246,3 +249,6 @@ def get_permissions(G, source, target, target_class):
 # 	allow source target:target_class permissions
 def is_allowed(G, source, target, target_class, permissions):
 	return set(permissions).issubset(G.get_edge_data(source, target, {}).get(target_class, {}))
+
+def write_exec_query(G):
+	return find_writable_executables(G).keys()
