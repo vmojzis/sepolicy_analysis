@@ -7,6 +7,15 @@ import policy_data_collection as data
 import domain_grouping as grouping
 import graph_builder as builder
 
+# parse comma separated list of [boolean_name]:[on/off] 
+def parse_bool_config(bool_arg):
+	bool_config = {}
+	for boolean in bool_arg.split(","):
+		b = boolean.split(":")
+		if len(b) >= 2:
+			bool_config[b[0]] = (b[1] == "on")
+	#print("Bool config:\n", bool_config, "\n", bool_arg)
+	return bool_config
 
 
 parser = argparse.ArgumentParser(description='SELinux policy analysis tool - graph builder.')
@@ -34,7 +43,7 @@ if args.classes:
 	args.classes = args.classes.split(",")
 
 if args.filter_bools != None:
-	args.filter_bools = builder.parse_bool_config(args.filter_bools)
+	args.filter_bools = parse_bool_config(args.filter_bools)
 
 builder.build_graph(args.policy, args.domain_grouping, args.filename, args.classes, args.filter_bools)
 

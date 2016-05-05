@@ -39,13 +39,13 @@ def build_graph(policyPath = None, group_domains = False, filename = "data/rules
 
 	domain_types = data.get_domain_types()
 	domain_types_str = set([str(x) for x in domain_types])
-	print("\tExpanding rules (attributes -> corresponding types)")
+	print("Expanding rules (attributes -> corresponding types)")
 	rules = data.expand_rules(rules)
-	print("\tFiltering (non-domain source, boolean settings,...)")
+	print("Filtering (non-domain source, boolean settings,...)")
 	rules = filter_non_domain(rules, domain_types_str)
 
 
-	print("\tConstructing graph matrix")
+	print("Constructing graph matrix")
 	G = nx.DiGraph()
 
 	matrix = defaultdict(set)
@@ -77,16 +77,16 @@ def build_graph(policyPath = None, group_domains = False, filename = "data/rules
 		for rule in rules:
 			matrix[(str(rule.source).lower(), str(rule.target).lower(), str(rule.tclass).lower())] |= set(rule.perms)
 
-	print("\tTransforming to adjacency list")
+	print("Transforming to adjacency list")
 
 	edges = [(key[0],key[1],{key[2]:value}) for key,value in matrix.items()]
 	#print("\n".join([str(x) for x in edges]))
-	print("\tAssembling graph")
+	print("Assembling graph")
 	G.add_edges_from(edges)
 	#rule.tclass
 
 	file = open(filename, 'wb')
-	print("\tSaving resulting graph")
+	print('Saving to "' + filename + '"')
 	pickle.dump(G, file)
 	file.close()
 

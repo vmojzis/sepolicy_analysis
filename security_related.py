@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import domain_grouping as grouping
+import sys
 
 # read "security_related.conf" and return corresponding types
 # returns (domain_types, resource_types)
@@ -45,5 +46,6 @@ def get_security_types():
 		return domains, resources 
 
 	except IOError as e:
-		return None
+		print('Could not read "security_related.conf"!', file=sys.stderr)
+		return set(), set()
 
