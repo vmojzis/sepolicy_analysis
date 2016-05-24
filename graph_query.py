@@ -75,9 +75,9 @@ def results_str(results, f_name):
 			return ""
 		# dictionary of results
 		if isinstance(results, dict):
-			return "\t" + "\n\t".join([item_str(x) + "\n\t\t" + item_str(y) for x,y in results.items()])
+			return "\t" + "\n\t".join([item_str(x) + "\n\t\t" + item_str(y) for x,y in sorted(results.items())])
 		
-		return "\t" + "\n\t".join([item_str(x) for x in results])
+		return "\t" + "\n\t".join([item_str(x) for x in sorted(results)])
 
 # item2 will be considered a baseline 
 # returns results in "item1" that are not in "item2"

@@ -195,8 +195,8 @@ def filter_terules_boolean(rules, bool_state = None):
 			for boolean in booleans:
 				boolean = str(boolean)
 				# get boolean setting (provided by "bool_state" dictionary, or get current value from active policy)
-				state = bool_state.get(boolean, selinux.security_get_boolean_active(boolean)) \
-					if bool_state else selinux.security_get_boolean_active(boolean)
+				state = bool_state.get(boolean, get_boolean_active(boolean)) \
+					if bool_state else get_boolean_active(boolean)
 				boolstate[boolean] = state
 			#print(boolstate)
 
@@ -210,6 +210,13 @@ def filter_terules_boolean(rules, bool_state = None):
 
 	return results
 
+#det value of given boolean from active policy
+def get_boolean_active(boolean):
+	try:
+		return selinux.security_get_boolean_active(boolean)
+	except:
+		return False
+
 
 # returns dictionary of all booleans and their current values
 def get_booleans():
@@ -218,7 +225,7 @@ def get_booleans():
 	# boolean.state contains default setting of the boolean
 	for boolean in __selinuxPolicy__.bools():
 		# get current setting of given boolean
-		bools[str(boolean)] = selinux.security_get_boolean_active(str(boolean)) == 1
+		bools[str(boolean)] = get_boolean_active(str(boolean)) == 1
 	return bools
 
 # is given type enforcement rule conditional?

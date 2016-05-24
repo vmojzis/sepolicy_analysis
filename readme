@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Dependencies:
 	setools 4 (installed using python3)
-		
 		setuptools
 		libselinux (Python bindings optional but recommended)
 		python3
@@ -30,21 +29,44 @@ Dependencies:
 		python3-networkx
 		PyQt5 (only if using graphical tools)
 		python3-PyQt5
+		redhat-rpm-config (qpol compilation)
 
 Installation:
-	You need to have SETools v4 package (locally) installed including all dependencies.
+	You need to have SETools v4 package (locally) installed including all dependencies (using python 3). Use commit faaf1a5b64e2e596bf94e5d31e81e834f1d5f764 or older (newer versions are not tested with this project).
+
 		- https://github.com/TresysTechnology/setools
-	SETools v4 should be inside this project folder under "setools_v4" 
-		- otherwise edit the inlude statement in "policy_data_collection.py"
-	As of yet, the project is far form finished and most of the functionality is not interconnected
-		- "test_setools.py" contains example uses of implemented functionality
-	Visual query is available via visual_query.py (-h for usage)
+
+	SETools v4 should be inside this project folder under "setools" 
+		- otherwise edit the include statement in "policy_data_collection.py"
+
+	$cd sepolicy_analysis
+	$git clone https://github.com/TresysTechnology/setools.git
+	$git checkout faaf1a5b64e2e596bf94e5d31e81e834f1d5f764
+
+	$sudo python3 setup.py build_ext -i
+
+	
+Tools:
+	visual_query.py - generates graphs representing selected part of policy (single source/target)
+
+	build_graph.py - create policy graph as a base for analysis
+
+	graph_query.py - policy analysis tool
+
 
 	Recommended pdf viewer for visual_query output is Okular (fast, deep zoom)
+
+Examples:
+	$./visual_query.py -s bluetooth_t -c file -fa domain,daemon -dg
+
+	$./build_graph.py -fb -c file,process data/graph_3.13.1-158.16 -p policy_data/selinux-policy-targeted-3.13.1-158.16/policy.29
+
+	$./graph_query.py data/graph_3.13.1-158.16 write_executable,transition_write,write_to_security,append_to_security
+
 
 Domain grouping (Done automatically by extract_cil.sh):
 	* Get cil files from /var/lib/selinux/targeted/active/modules/100/<module_name>/cil, extract them,
 	  and save them in a directory as <module_name>.cil
-	
+
 	* Run domain_grouping.parse_cil_files(path_cil_files) and save result to domain_groups_cil.conf
 	  (contains colon-separated triples "group_name:domain_types:resource_types")

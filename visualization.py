@@ -234,7 +234,7 @@ def visualise_rules(main_domain, is_source, rules, size_multiplier = 1):
 			conditional_edges.add((source, target))
 	
 	#print booleans
-	print("Boolean conditioned edges:\n")
+	print("Boolean conditioned edges (dashed lines):\n")
 	for key,value in booleans.items():
 		print(key+":")
 		for t in value:
@@ -393,8 +393,8 @@ def make_graph(edges, colored_edges, dotted_edges, me, size_multiplier = 1.2):
 	nx.draw_networkx_labels(G, pos2, nodelist = edges_legend, font_size=16)
 	nx.draw_networkx_nodes(G, pos, nodelist = edges_legend, node_color = edge_colors)
 	#------------------------------
-
-	plt.savefig("path.pdf", format='pdf', dpi=500)
+ 
+	plt.savefig("graph.pdf", format='pdf', dpi=500)
 	#plt.show()
 	#nx.draw_graphviz(G)
 	#nx.write_dot(G,'file.dot')

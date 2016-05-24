@@ -33,7 +33,7 @@ parser.add_argument("-fb", "--filter_bools", nargs="?", dest="filter_bools", con
 parser.add_argument("-c", "--class", dest="classes",
                   help="Comma separated list of object classes")
 
-parser.add_argument("policy", help="Path to the SELinux policy to be used.", nargs="?")
+parser.add_argument("-p", "--policy", dest="policy", help="Path to the SELinux policy to be used.", nargs="?")
 
 
 args = parser.parse_args()

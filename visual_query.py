@@ -82,7 +82,7 @@ if not (args.source or args.target or args.source_group or args.target_group):
 	sys.exit()
 
 # split list attributes
-for arg in ["perms", "attr", "boolean", "tclass"]:
+for arg in ["perms", "attr", "boolean", "tclass", "filter_attrs"]:
 	value = getattr(args, arg)
 	if value:
 		setattr(args, arg, value.split(","))

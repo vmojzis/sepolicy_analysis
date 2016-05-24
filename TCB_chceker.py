@@ -77,7 +77,7 @@ non_entry = TCB_resources - entrypoints
 
 #print("\n".join(entrypoints & TCB_resources))
 #print([x for x in non_entry if "exec_t" in x])
-writes,tcb_writes = get_writes_to(TCB_all ) # & entrypoints)
+writes,tcb_writes = get_writes_to(TCB_all & entrypoints) # & entrypoints)
 
 #print results sorted according to "value" length
 for key,value in sorted(writes.items(), key=lambda x: len(x[1])):
