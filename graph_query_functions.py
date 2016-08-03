@@ -39,7 +39,8 @@ def transition_write_query(G):
 			results.add((source,target,entry))
 	return results
 
-
+# Find domains that are allowed write access to "security related" types
+# Lists domains with the specified write access and affected types (security types that can be written to)
 def write_to_security_query(G):
 	domains, resources = get_security_types()
 	sec_types = domains | resources

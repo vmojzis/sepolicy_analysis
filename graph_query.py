@@ -101,7 +101,7 @@ def diff(item1, item2):
 def item_str(item):
 	# item is list or set
 	if (isinstance(item, list) or isinstance(item, tuple) or isinstance(item, set)):
-		return ", ".join([str(x) for x in item])
+		return ", ".join([str(x) for x in sorted(item)])
 	else:
 		return str(item)
 

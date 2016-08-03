@@ -71,7 +71,10 @@ def expand_rules(rules):
 		if (not is_attribute(rule.source)) and not (is_attribute(rule.target)):
 			results.append(rule)
 		else:
-			results.extend(expand_rule(rule))
+			# discard rules corresponding to unconfined attributes 
+			# TODO: add command line argument that switches this off - i.e. consider unconfined attributes
+			if (not is_unconfined_attr(rule.source)) and (not is_unconfined_attr(rule.target)): 
+				results.extend(expand_rule(rule))
 
 	return results
 
@@ -240,10 +243,14 @@ def is_conditional(rule):
 	except setools.policyrep.exception.RuleNotConditional:
 		False
 
-# is given object of type "TypeAttribute"
+# is given object of type "TypeAttribute" ?
 def is_attribute(obj):
 	return isinstance(obj, setools.policyrep.typeattr.TypeAttribute)
 
+# is given object of type "TypeAttribute" which is considered unconfined ?
+# TODO: refine -- limit to "strong" unconfined domains (associated with lots of privileges)
+def is_unconfined_attr(obj):
+	return str(obj).__contains__("unconfined") if is_attribute(obj) else False 
 
 # return expanded te rule
 def make_expanded_rule(original_rule, source, target):
