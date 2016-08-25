@@ -107,6 +107,10 @@ def build_graph(policyPath = None, group_domains = False, filename = "data/rules
 	print('Saving to "' + filename + '"')
 	pickle.dump(G, file)
 	file.close()
+	#edges = {(key[0],key[1]) for key,value in matrix.items()}
+	#G.add_edges_from(edges)
+	#nx.write_gexf(G,filename + ".gexf")
+	#print(filename + ".gexf")
 
 def build_basic_graphs():
 	print(">>> Building graph. tclass = [file, process]")

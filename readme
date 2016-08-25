@@ -16,6 +16,27 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+Purpose:
+	* Automated search for specified permission pathways
+		- Overly relaxed policy modules
+		- Unintended side effects of attribute/macro use
+		- Unforeseen module interactions
+		- Alternative for neverallow rules
+			> More complicated relationships
+			> Allows for exceptions
+
+	* Regression testing
+		- Comparison of policy versions 
+		- Alternative for sediff
+			> Shows only specified differences
+			> More resource effective
+
+	* CVE evaluation (work in progress)
+		- Does SELinux stop the threat in current configuration?
+		- Which rules are necessary for the CVE to be exploitable
+			> Removal of any of them would stop the treat
+
+
 Dependencies:
 	setools 4 (installed using python3)
 		setuptools

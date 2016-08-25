@@ -118,6 +118,10 @@ def find_writable_executables(G):
 	#for (u, v, data) in G.edges_iter(data="process"):
 	execute_no_trans = set(["execute_no_trans", "read", "getattr"])
 	for (u, v, data) in G.edges_iter(data=True):
+		#exclude types with entrypoints everywhere
+		#if(str(v) in ["openshift_initrc_t", "svirt_lxc_net_t", "svirt_qemu_net_t", "svirt_kvm_net_t", "sandbox_min_t", "sandbox_min_client_t", "sandbox_x_t", "sandbox_x_client_t", "sandbox_web_t", "sandbox_web_client_t", "sandbox_net_t", "sandbox_net_client_t", "virtd_lxc_t"]):
+		#	continue
+
 		fileperms = data.get("file", {})
 		if (("entrypoint" in fileperms) or 
 			execute_no_trans.issubset(fileperms)): #domain "u" can execute given file without transition

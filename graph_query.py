@@ -118,20 +118,22 @@ def diff(item1, item2):
 
 def item_str(item):
 	# item is list or set
-	if (isinstance(item, list) or isinstance(item, tuple) or isinstance(item, set)):
+	if (isinstance(item, list) or isinstance(item, set)):
 		return ", ".join([str(x) for x in sorted(item)])
+	if isinstance(item, tuple):
+		return ", ".join([str(x) for x in item])
 	else:
 		return str(item)
 
 
 parser = argparse.ArgumentParser(description='SELinux policy analysis tool - graph query.')
 
-parser.add_argument("filename", help="Policy graph file.")
+parser.add_argument("filename", metavar="POLICY_GRAPH", help="Policy graph file.")
 
-parser.add_argument("query_functions", help="Comma separated list of query functions to be executed.")
+parser.add_argument("query_functions", metavar="QUERY_FUNCTIONS", help="Comma separated list of query functions to be executed.")
 
-parser.add_argument("-d", "--diff", metavar="FILENAME2", dest="diff_filename",
-                  help="Another policy graph file.")
+parser.add_argument("-d", "--diff", metavar="POLICY_GRAPH2", dest="diff_filename",
+                  help="Another policy graph file for comparison.")
 
 args = parser.parse_args()
 

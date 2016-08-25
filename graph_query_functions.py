@@ -28,7 +28,7 @@ from security_related import get_security_types
 
 
 ''' 
-User defined functions HAVE TO adhere to following naming scheme
+User defined functions HAVE TO adhere to the following naming scheme
 
  "funciton_name"_query(graph)
  	returns list/set of results 
@@ -54,7 +54,8 @@ def transition_write_query(G):
 	results = set()
 	for source,target,entry in transitions:
 		if ("write" in G.get_edge_data(source,entry, {}).get("file", {})):
-			results.add((source,target,entry))
+			if (str(entry).endswith("exec_t")):
+				results.add((source,target,entry))
 	return results
 
 # Find domains that are allowed write access to "security related" types

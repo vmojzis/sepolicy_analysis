@@ -37,18 +37,19 @@ def parse_bool_config(bool_arg):
 
 parser = argparse.ArgumentParser(description='SELinux policy analysis tool - graph builder.')
 
-parser.add_argument("filename", help="Name for the new policy graph file.")
+parser.add_argument("filename", metavar="FILENAME", help="Name for the new policy graph file.")
 
-parser.add_argument("-dg", action="store_true", dest="domain_grouping",
-                  help="Group SELinux domains based on package they belong to.")
-
+parser.add_argument("-dg", "--domain_grouping", action="store_true", dest="domain_grouping",
+                  help="Group SELinux domains based on package they belong to. \
+                  		Use with caution, generates false positives!")
 
 parser.add_argument("-fb", "--filter_bools", nargs="?", dest="filter_bools", const="",
                   help="Filter rules based on current boolean setting \
                   	    (or boolean config file or comma separated list of [boolean]:[on/off]).")
 
 parser.add_argument("-c", "--class", dest="classes",
-                  help="Comma separated list of object classes")
+                  help="Comma separated list of object classes to be present \
+                  		in the graph. All classes assumed if ommited.")
 
 parser.add_argument("-p", "--policy", dest="policy", help="Path to the SELinux policy to be used.", nargs="?")
 
