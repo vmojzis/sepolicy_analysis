@@ -337,11 +337,14 @@ def make_graph(edges, colored_edges, dotted_edges, me, size_multiplier = 1.2):
 	# generate circular layout using graph without main node (which will be in the center)
 	G2 = nx.DiGraph()
 	G2.add_nodes_from(G.node)
-	G2.remove_node(me)
+	try:
+		G2.remove_node(me)
+	except:
+		pass
 	pos=nx.circular_layout(G2)
 	del(G2)
 	
-	pos[me] = [0.5,0.5]
+	pos[me] = [0,0] #[0.5,0.5] -- changes with releases of networkx
 
 	#######################
 	# customized graph drawing
@@ -349,6 +352,8 @@ def make_graph(edges, colored_edges, dotted_edges, me, size_multiplier = 1.2):
 	# set canvas size
 	figsize = len(edges) if len(edges) > 30 else 30
 	figsize *= size_multiplier
+	# label offset (to the position of nodes) -- 1.8 was determined by trial and error
+	offset = 1.8/figsize
 	if figsize > 400:
 		figsize = 400
 		print("\nMaximum canvas size exceeded, the graph may not scale properly!\n")
@@ -381,7 +386,7 @@ def make_graph(edges, colored_edges, dotted_edges, me, size_multiplier = 1.2):
 	nx.draw_networkx_edge_labels(G,pos, edge_labels = edges, clip_on = True, label_pos=0.5, font_size=13)
 	pos2 = {}
 	for vector in G.node:
-		pos2[vector] = [pos[vector][0], pos[vector][1]+ 1.0/figsize]
+		pos2[vector] = [pos[vector][0], pos[vector][1]+ offset]
 
 	nx.draw_networkx_labels(G,pos2,font_size=16)
 
@@ -393,14 +398,16 @@ def make_graph(edges, colored_edges, dotted_edges, me, size_multiplier = 1.2):
 
 	#2.5 in graph coordinates is width of the whole graph
 	if len(edges_legend) < 2:
-		x_pos = 0.5
+		#x_pos = 0.5
+		x_pos = 0
 		_delta = 0
 	else:
-		_delta = 1/(len(edges_legend)-1)
-		x_pos = 0
+		_delta = 2/(len(edges_legend)-1)
+		#x_pos = 0
+		x_pos = -1
 	for attr in edges_legend:
-		pos2[attr.upper()] = [x_pos,-0.1+1.0/figsize]
-		pos[attr.upper()] = [x_pos,-0.1]
+		pos2[attr.upper()] = [x_pos,-1.1+offset]
+		pos[attr.upper()] = [x_pos,-1.1]
 		x_pos += _delta
 	
 	#permission sets legend
