@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='utf-8'?>
+<gexf version="1.1" xmlns="http://www.gexf.net/1.1draft" xmlns:viz="http://www.gexf.net/1.1draft/viz" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2001/XMLSchema-instance">
+  <graph defaultedgetype="directed" mode="static">
+    <nodes>
+      <node id="gitosis_var_lib_t" label="gitosis_var_lib_t" />
+      <node id="faillog_t" label="faillog_t" />
+      <node id="logfile" label="logfile" />
+      <node id="SSH_SERVER" label="SSH_SERVER" />
+      <node id="pam_var_run_t" label="pam_var_run_t" />
+      <node id="user_tmp_type" label="user_tmp_type" />
+      <node id="ssh_home_t" label="ssh_home_t" />
+      <node id="POLYDOMAIN" label="POLYDOMAIN" />
+      <node id="cluster_tmp_t" label="cluster_tmp_t" />
+      <node id="proc_afs_t" label="proc_afs_t" />
+      <node id="user_tmp_t" label="user_tmp_t" />
+      <node id="initrc_var_run_t" label="initrc_var_run_t" />
+      <node id="puppet_tmp_t" label="puppet_tmp_t" />
+      <node id="systemd_passwd_var_run_t" label="systemd_passwd_var_run_t" />
+      <node id="proc_t" label="proc_t" />
+      <node id="auth_home_t" label="auth_home_t" />
+      <node id="fusefs_t" label="fusefs_t" />
+      <node id="wtmp_t" label="wtmp_t" />
+      <node id="LOGIN_PGM" label="LOGIN_PGM" />
+      <node id="user_cron_spool_t" label="user_cron_spool_t" />
+      <node id="var_auth_t" label="var_auth_t" />
+      <node id="cgroup_t" label="cgroup_t" />
+      <node id="condor_var_lib_t" label="condor_var_lib_t" />
+      <node id="cluster_var_lib_t" label="cluster_var_lib_t" />
+      <node id="krb5_host_rcache_t" label="krb5_host_rcache_t" />
+      <node id="ecryptfs_t" label="ecryptfs_t" />
+      <node id="openshift_tmp_t" label="openshift_tmp_t" />
+      <node id="initrc_tmp_t" label="initrc_tmp_t" />
+      <node id="security_t" label="security_t" />
+      <node id="sshd_var_run_t" label="sshd_var_run_t" />
+      <node id="nfs_t" label="nfs_t" />
+      <node id="cifs_t" label="cifs_t" />
+      <node id="kdbusfs_t" label="kdbusfs_t" />
+      <node id="lastlog_t" label="lastlog_t" />
+      <node id="auth_cache_t" label="auth_cache_t" />
+      <node id="cluster_var_run_t" label="cluster_var_run_t" />
+      <node id="sshd_t" label="sshd_t" />
+      <node id="cluster_conf_t" label="cluster_conf_t" />
+      <node id="DAEMON" label="DAEMON" />
+      <node id="root_t" label="root_t" />
+      <node id="user_home_t" label="user_home_t" />
+      <node id="USERDOM_HOME_MANAGER_TYPE" label="USERDOM_HOME_MANAGER_TYPE" />
+    </nodes>
+    <edges>
+      <edge id="0" source="sshd_t" target="gitosis_var_lib_t" />
+      <edge id="1" source="sshd_t" target="faillog_t" />
+      <edge id="2" source="sshd_t" target="logfile" />
+      <edge id="3" source="sshd_t" target="pam_var_run_t" />
+      <edge id="4" source="sshd_t" target="user_tmp_type" />
+      <edge id="5" source="sshd_t" target="ssh_home_t" />
+      <edge id="6" source="sshd_t" target="cluster_tmp_t" />
+      <edge id="7" source="sshd_t" target="proc_afs_t" />
+      <edge id="8" source="sshd_t" target="user_tmp_t" />
+      <edge id="9" source="sshd_t" target="initrc_var_run_t" />
+      <edge id="10" source="sshd_t" target="puppet_tmp_t" />
+      <edge id="11" source="sshd_t" target="systemd_passwd_var_run_t" />
+      <edge id="12" source="sshd_t" target="proc_t" />
+      <edge id="13" source="sshd_t" target="auth_home_t" />
+      <edge id="14" source="sshd_t" target="fusefs_t" />
+      <edge id="15" source="sshd_t" target="wtmp_t" />
+      <edge id="16" source="sshd_t" target="user_cron_spool_t" />
+      <edge id="17" source="sshd_t" target="var_auth_t" />
+      <edge id="18" source="sshd_t" target="condor_var_lib_t" />
+      <edge id="19" source="sshd_t" target="cluster_var_lib_t" />
+      <edge id="20" source="sshd_t" target="krb5_host_rcache_t" />
+      <edge id="21" source="sshd_t" target="ecryptfs_t" />
+      <edge id="22" source="sshd_t" target="openshift_tmp_t" />
+      <edge id="23" source="sshd_t" target="initrc_tmp_t" />
+      <edge id="24" source="sshd_t" target="security_t" />
+      <edge id="25" source="sshd_t" target="sshd_var_run_t" />
+      <edge id="26" source="sshd_t" target="nfs_t" />
+      <edge id="27" source="sshd_t" target="cifs_t" />
+      <edge id="28" source="sshd_t" target="kdbusfs_t" />
+      <edge id="29" source="sshd_t" target="lastlog_t" />
+      <edge id="30" source="sshd_t" target="auth_cache_t" />
+      <edge id="31" source="sshd_t" target="cluster_var_run_t" />
+      <edge id="32" source="sshd_t" target="cgroup_t" />
+      <edge id="33" source="sshd_t" target="cluster_conf_t" />
+      <edge id="34" source="sshd_t" target="root_t" />
+      <edge id="35" source="sshd_t" target="user_home_t" />
+    </edges>
+  </graph>
+</gexf>

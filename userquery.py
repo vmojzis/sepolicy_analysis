@@ -30,7 +30,7 @@ from edge_labels_optimizer import process_edge_labels, print_permission_sets
 
 import policy_data_collection as data
 import config_loading as config
-import visualization as vis
+import visualization_ as vis
 import domain_grouping as grouping
 import math
 import sys
