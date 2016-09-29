@@ -332,7 +332,7 @@ def make_graph(edges, colored_edges, dotted_edges, me, size_multiplier = 1.2):
 	#for (x,y) in edges.keys():
 	#	print(x + " - " + y)
 
-	G.add_edges_from(edges.keys()) # nodes are added with keys - no unconnected edges
+	G.add_edges_from([(u,v,{'label':edges[(u, v)]}) for (u,v) in edges.keys()]) # nodes are added with keys - no unconnected edges
 
 	# generate circular layout using graph without main node (which will be in the center)
 	G2 = nx.DiGraph()
@@ -419,14 +419,14 @@ def make_graph(edges, colored_edges, dotted_edges, me, size_multiplier = 1.2):
 	#------------------------------
  
 	#plt.savefig("graph.pdf", format='pdf', dpi=500)
-	print("writing - " + "graph" + ".gexf")
-	nx.write_gexf(G,"graph" + ".gexf")
+	#print("writing - " + "graph" + ".gexf")
+	#nx.write_gexf(G,"graph" + ".gexf")
 	#plt.show()
 	#nx.draw_graphviz(G)
-	#nx.write_dot(G,'file.dot')
+	#nx.write_dot(G,'graph.dot')
 
 	#export grahp to "trolo"
-	#nx.write_graphml(G, "trolo")
+	nx.write_graphml(G, "graph.graphml")
 
 
 
