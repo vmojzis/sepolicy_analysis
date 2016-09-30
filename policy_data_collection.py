@@ -207,6 +207,7 @@ def get_type_enf_rules(ruletype = ["allow"],
 # bool_state -> dictionary of booleans and their states - default is current boolean status
 def filter_terules_boolean(rules, bool_state = None):
 	results = []
+	#print(bool_state)
 	for rule in rules:
 		try:
 			booleans = rule.conditional.booleans
@@ -219,7 +220,6 @@ def filter_terules_boolean(rules, bool_state = None):
 				state = bool_state.get(boolean, get_boolean_active(boolean)) \
 					if bool_state else get_boolean_active(boolean)
 				boolstate[boolean] = state
-			#print(boolstate)
 
 			if rule.conditional.evaluate(**boolstate):
 				# return rules in agreement with boolean settings
