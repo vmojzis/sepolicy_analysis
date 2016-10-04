@@ -32,6 +32,7 @@ import policy_data_collection as data
 import config_loading as config
 import visualization_ as vis
 import domain_grouping as grouping
+import gephi_export as export
 import math
 import sys
 
@@ -45,7 +46,7 @@ class UserQuery:
 
 	# gather all rules corresponding to the query and visualize them
 	def apply_query(self):
-		rules = self.gather_rules()
+		rules = self.gather_rules_gephi() if True else self.gather_rules() # TODO gephi
 		#print("Got rules, starting filtering")
 
 		# self.qargs.filter_bools can be empty list - meaning system boolean setting is in use
@@ -60,7 +61,7 @@ class UserQuery:
 		if self.qargs.expand_attributes:
 			rules = self.expand_rules(rules)
 
-		#visualize
+		#Rewrite rules to feature domain groups instead of types
 		if self.qargs.domain_grouping:
 			rules =self.rewrite_rules_grouping(rules)
 
@@ -68,6 +69,11 @@ class UserQuery:
 		if len(rules) == 0:
 			print("No rules found!", file=sys.stderr)
 			sys.exit()
+
+		#gephi export TODO: rewrite as command line argument
+		if True:
+			export.export_package(self.main_group, self.package_attributes, rules)
+			return
 
 		#vusualize results
 		if self.qargs.source_group or self.qargs.target_group:
@@ -124,6 +130,53 @@ class UserQuery:
 							    )
 		return rules
 
+	def gather_rules_gephi(self):
+		rules = []
+		
+		self.domain_grouping = grouping.group_types_cil()
+		#reversal of domain grouping - for fast inverse search
+		self.reverse_grouping = {}
+		for group in self.domain_grouping.values():
+			for _type in group.types:
+				self.reverse_grouping[_type] = group#group.name.upper()
+		print("Got grouping, getting rules.")
+		
+		self.main_group = self.domain_grouping.get(self.qargs.main_domain)
+		print(self.qargs.main_domain)
+		package_types = set(self.main_group.types)
+
+		package_attributes = set()
+		#get all attributes corresponding to types in given package
+		for t in package_types:
+			package_attributes |= set(data.get_attributes_of_str(t))
+		if self.qargs.filter_attrs:
+			package_attributes -= set(self.qargs.filter_attrs) #TODO should there really be "-="?
+
+		self.package_attributes = package_attributes
+
+		all_rules = data.get_type_enf_rules(ruletype = ["allow"],
+											    tclass = self.qargs.tclass,
+												perms = self.qargs.perms,
+												booleans = self.qargs.boolean
+										    )
+		# get only rules corresponding to given package
+		for rule in all_rules:
+			source = str(rule.source)
+			if data.is_attribute(rule.source):
+				if (source in package_attributes):
+					rules.append(rule)
+			elif (source in package_types):
+				rules.append(rule)
+
+			target = str(rule.target)
+			if data.is_attribute(rule.target):
+				if (target in package_attributes):
+					rules.append(rule)
+			elif (target in package_types):
+				rules.append(rule)
+
+		return rules
+
 	def expand_rules(self, rules):
 		expanded_rules = []
 		other_side = "target" if self.qargs.source else "source"
@@ -162,6 +215,16 @@ class UserQuery:
 	def filter_attribute_rules(self, rules):
 		# filter attribute rules
 		filtered_rules = []
+		
+		if True: #TODO gephi
+			for rule in rules:
+				if (data.is_attribute(rule.source) and (str(rule.source) in self.qargs.filter_attrs)) or \
+				   (data.is_attribute(rule.target) and (str(rule.target) in self.qargs.filter_attrs)):
+					continue				
+				filtered_rules.append(rule)
+
+			return filtered_rules
+
 		for rule in rules:
 			attr = str(getattr(rule, "source" if self.qargs.source else "target"))
 

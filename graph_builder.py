@@ -97,8 +97,8 @@ def build_graph(policyPath = None, group_domains = False, filename = "data/rules
 
 	print("Transforming to adjacency list")
 
-	#edges = [(key[0],key[1],{key[2]:value}) for key,value in matrix.items()]
-	edges = [(key[0],key[1],{key[2]:",".join([str(x) for x in value])}) for key,value in matrix.items()]
+	edges = [(key[0],key[1],{key[2]:value}) for key,value in matrix.items()]
+	#edges = [(key[0],key[1],{key[2]:",".join([str(x) for x in value])}) for key,value in matrix.items()]
 	
 	print("Assembling graph")
 	G.add_edges_from(edges)
