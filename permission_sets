@@ -1,0 +1,42 @@
+ADD_ENTRY_DIR: add_name, getattr, ioctl, lock, open, search, write
+APPEND_FILE: append, getattr, ioctl, lock, open
+APPEND_LNK_FILE: append, getattr, ioctl, lock
+CONNECTED_SOCKET: append, bind, create, getattr, getopt, ioctl, read, setattr, setopt, shutdown, write
+CONNECTED_STREAM_SOCKET: accept, append, bind, create, getattr, getopt, ioctl, listen, read, setattr, setopt, shutdown, write
+CREATE_MSGQ: associate, create, destroy, enqueue, getattr, read, setattr, unix_read, unix_write, write
+CREATE_SEM: associate, create, destroy, getattr, read, setattr, unix_read, unix_write, write
+CREATE_SHM: associate, create, destroy, getattr, lock, read, setattr, unix_read, unix_write, write
+CREATE_SOCKET: append, bind, connect, create, getattr, getopt, ioctl, lock, read, setattr, setopt, shutdown, write
+CREATE_SOCK_FILE: create, getattr, open, setattr
+CREATE_STREAM_SOCKET: accept, append, bind, connect, create, getattr, getopt, ioctl, listen, lock, read, setattr, setopt, shutdown, write
+DEL_ENTRY_DIR: getattr, ioctl, lock, open, remove_name, search, write
+EXEC_FILE: execute, execute_no_trans, getattr, ioctl, open, read
+LIST_DIR: getattr, ioctl, lock, open, read, search
+MANAGE_DIR: add_name, create, getattr, ioctl, link, lock, open, read, remove_name, rename, reparent, rmdir, search, setattr, unlink, write
+MANAGE_FILE: append, create, getattr, ioctl, link, lock, open, read, rename, setattr, unlink, write
+MANAGE_KEY: create, link, read, search, setattr, view, write
+MANAGE_LNK_FILE: append, create, getattr, ioctl, link, lock, read, rename, setattr, unlink, write
+MANAGE_SERVICE: disable, enable, reload, start, status, stop
+MMAP_FILE: execute, getattr, ioctl, open, read
+MOUNT_FS: getattr, mount, remount, unmount
+PACKET_SEND_RCV: rawip_recv, rawip_send, tcp_recv, tcp_send, udp_recv, udp_send
+READ_FILE: getattr, ioctl, lock, open, read
+READ_INHERITED_FILE: getattr, ioctl, lock, read
+RW_DIR: add_name, getattr, ioctl, lock, open, read, remove_name, search, write
+RW_FILE: append, getattr, ioctl, lock, open, read, write
+RW_INHERITED_FILE: append, getattr, ioctl, lock, read, write
+RW_INHERITED_SOCK_FILE: append, getattr, read, write
+RW_LNK_FILE: getattr, ioctl, lock, read, write
+RW_MSGQ: associate, enqueue, getattr, read, unix_read, unix_write, write
+RW_NETLINK_SOCKET: append, bind, connect, create, getattr, getopt, ioctl, lock, nlmsg_read, nlmsg_write, read, setattr, setopt, shutdown, write
+RW_SEM: associate, getattr, read, unix_read, unix_write, write
+RW_SHM: associate, getattr, lock, read, unix_read, unix_write, write
+RW_SOCKET: append, bind, connect, getattr, getopt, ioctl, lock, read, setattr, setopt, shutdown, write
+RW_SOCK_FILE: append, getattr, open, read, write
+RW_STREAM_SOCKET: accept, append, bind, connect, getattr, getopt, ioctl, listen, lock, read, setattr, setopt, shutdown, write
+R_NETLINK_SOCKET: append, bind, connect, create, getattr, getopt, ioctl, lock, nlmsg_read, read, setattr, setopt, shutdown, write
+R_SHM: associate, getattr, read, unix_read
+SIGNAL: sigchld, sigkill, signal, signull, sigstop
+WRITE_FILE: append, getattr, ioctl, lock, open, write
+WRITE_INHERITED_FILE: append, getattr, ioctl, lock, write
+WRITE_SOCK_FILE: append, getattr, open, write
