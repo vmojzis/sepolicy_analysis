@@ -30,7 +30,7 @@ def parse_bool_config(bool_arg):
 	for boolean in bool_arg.split(","):
 		b = boolean.split(":")
 		if len(b) >= 2:
-			bool_config[b[0]] = (b[1] == "on")
+			bool_config[b[0]] = 1 if (b[1] == "on") else 0
 	#print("Bool config:\n", bool_config, "\n", bool_arg)
 	return bool_config
 

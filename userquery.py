@@ -30,7 +30,7 @@ from edge_labels_optimizer import process_edge_labels, print_permission_sets
 
 import policy_data_collection as data
 import config_loading as config
-import visualization_ as vis
+import visualization as vis
 import domain_grouping as grouping
 import gephi_export as export
 import math
@@ -39,14 +39,17 @@ import sys
 class UserQuery:
 	""" SETools policy query """
 	#query arguments (object returned by argparser)
-	#qargs = None
 	def __init__(self, args):
-		self.qargs = args
+		#compatibility with different args objects
+		for attr in ['source_group', 'target_group', 'source', 'target', 'main_domain', 'tclass', 'perms', 'boolean', 'filter_attrs', 'filter_bools', 'expand_attributes:', 'domain_grouping', 'export']:
+			if not hasattr(args, attr):
+				setattr(args, attr, None)
 
+		self.qargs = args
 
 	# gather all rules corresponding to the query and visualize them
 	def apply_query(self):
-		rules = self.gather_rules_gephi() if True else self.gather_rules() # TODO gephi
+		rules = self.gather_rules_gephi() if self.qargs.export else self.gather_rules() # TODO gephi
 		#print("Got rules, starting filtering")
 
 		# self.qargs.filter_bools can be empty list - meaning system boolean setting is in use
@@ -63,7 +66,7 @@ class UserQuery:
 
 		#Rewrite rules to feature domain groups instead of types
 		if self.qargs.domain_grouping:
-			rules =self.rewrite_rules_grouping(rules)
+			rules = self.rewrite_rules_grouping(rules)
 
 		#Abort in case no rules were found
 		if len(rules) == 0:
@@ -71,7 +74,7 @@ class UserQuery:
 			sys.exit()
 
 		#gephi export TODO: rewrite as command line argument
-		if True:
+		if self.qargs.export:
 			export.export_package(self.main_group, self.package_attributes, rules)
 			return
 
@@ -134,14 +137,13 @@ class UserQuery:
 		rules = []
 		
 		self.domain_grouping = grouping.group_types_cil()
-		#reversal of domain grouping - for fast inverse search
-		self.reverse_grouping = {}
-		for group in self.domain_grouping.values():
-			for _type in group.types:
-				self.reverse_grouping[_type] = group#group.name.upper()
-		print("Got grouping, getting rules.")
+		#print("Got grouping, getting rules.")
 		
 		self.main_group = self.domain_grouping.get(self.qargs.main_domain)
+		if not self.main_group:
+			print("Error: Unknown package \"" + self.qargs.main_domain + "\"!", file=sys.stderr)
+			sys.exit()
+
 		print(self.qargs.main_domain)
 		package_types = set(self.main_group.types)
 
@@ -216,7 +218,7 @@ class UserQuery:
 		# filter attribute rules
 		filtered_rules = []
 		
-		if True: #TODO gephi
+		if self.qargs.export: #TODO gephi
 			for rule in rules:
 				if (data.is_attribute(rule.source) and (str(rule.source) in self.qargs.filter_attrs)) or \
 				   (data.is_attribute(rule.target) and (str(rule.target) in self.qargs.filter_attrs)):

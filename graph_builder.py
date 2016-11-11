@@ -98,20 +98,18 @@ def build_graph(policyPath = None, group_domains = False, filename = "data/rules
 	print("Transforming to adjacency list")
 
 	edges = [(key[0],key[1],{key[2]:value}) for key,value in matrix.items()]
-	#edges = [(key[0],key[1],{key[2]:",".join([str(x) for x in value])}) for key,value in matrix.items()]
-	
+	#print("\n".join([str(x) for x in edges]))
 	print("Assembling graph")
 	G.add_edges_from(edges)
 	#rule.tclass
 
-	#file = open(filename, 'wb')
-	#print('Saving to "' + filename + '"')
-	#pickle.dump(G, file)
-	#file.close()
+	file = open(filename, 'wb')
+	print('Saving to "' + filename + '"')
+	pickle.dump(G, file)
+	file.close()
 	#edges = {(key[0],key[1]) for key,value in matrix.items()}
 	#G.add_edges_from(edges)
 	#nx.write_gexf(G,filename + ".gexf")
-	nx.write_graphml(G,filename + ".graphml")
 	#print(filename + ".gexf")
 
 def build_basic_graphs():

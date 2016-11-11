@@ -219,7 +219,6 @@ def filter_terules_boolean(rules, bool_state = None):
 				state = bool_state.get(boolean, get_boolean_active(boolean)) \
 					if bool_state else get_boolean_active(boolean)
 				boolstate[boolean] = state
-			#print(boolstate)
 
 			if rule.conditional.evaluate(**boolstate):
 				# return rules in agreement with boolean settings

@@ -125,7 +125,8 @@ def find_writable_executables(G):
 		fileperms = data.get("file", {})
 		if (("entrypoint" in fileperms) or 
 			execute_no_trans.issubset(fileperms)): #domain "u" can execute given file without transition
-			execs[v].add(u)
+			if (str(v).endswith("exec_t")):
+				execs[v].add(u)
 
 	writable = defaultdict(set)
 	for key,value in execs.items():
