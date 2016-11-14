@@ -100,28 +100,28 @@ class UserQuery:
 					self.reverse_grouping[_type] = group#group.name.upper()
 			#print("Got grouping, getting rules.")
 			
-			#get group containing specified source/target type 
-			if self.qargs.source_group or self.qargs.target_group:
-				self.main_group = self.reverse_grouping.get(self.qargs.main_domain)
+		#get group containing specified source/target type 
+		if self.qargs.source_group or self.qargs.target_group:
+			self.main_group = self.domain_grouping.get(self.qargs.main_domain)
 
-				if not self.main_group:
-					print("Error: Unknown type \"" + self.qargs.main_domain + "\"!", file=sys.stderr)
-					sys.exit()
+			if not self.main_group:
+				print("Error: Unknown type \"" + self.qargs.main_domain + "\"!", file=sys.stderr)
+				sys.exit()
 
-				#get all rules corresponding to source/target domain group
-				print("Gathering rules for following types: ", end="", sep="")
-				for type_ in sorted(self.main_group.types):
-					print(type_, ", ", end="", sep="", flush=True)
-					source = type_ if self.qargs.source else None
-					target = type_ if self.qargs.target else None
-					rules += data.get_type_enf_rules(ruletype = ["allow"],
-												    source = source,
-												    target = target, 
-												    tclass = self.qargs.tclass,
-													perms = self.qargs.perms,
-													booleans = self.qargs.boolean
-												    )
-				print("\n")
+			#get all rules corresponding to source/target domain group
+			print("Gathering rules for following types: ", end="", sep="")
+			for type_ in sorted(self.main_group.types):
+				print(type_, ", ", end="", sep="", flush=True)
+				source = type_ if self.qargs.source else None
+				target = type_ if self.qargs.target else None
+				rules += data.get_type_enf_rules(ruletype = ["allow"],
+											    source = source,
+											    target = target, 
+											    tclass = self.qargs.tclass,
+												perms = self.qargs.perms,
+												booleans = self.qargs.boolean
+											    )
+			print("\n")
 		# source/target is single type
 		if not (self.qargs.source_group or self.qargs.target_group):
 			rules = data.get_type_enf_rules(ruletype = ["allow"],
