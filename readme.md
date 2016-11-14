@@ -42,7 +42,7 @@ Understanding policy statements can be difficult because of the use of macros an
     Switch to "visualization" branch:
     $git checkout visualization
     Generate "graphml" file containing policy concerning selected module:
-    $./visual_query.py -s <policy_module> -fb
+    $./export_graph.py <policy_module> -fb
     Open in [Gephi](https://gephi.org/) and change colours of nodes (attributes/types/types from selected package) and edges (attribute assignments/access vectors) based on their type. Edge labels contain permissions (or permission sets) concerning adjacent nodes.
 
 ***

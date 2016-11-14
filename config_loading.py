@@ -36,3 +36,13 @@ def get_boolean_config():
 
 	except IOError as e:
 		return None
+
+# parse comma separated list of [boolean_name]:[on/off] 
+def parse_bool_config(bool_arg):
+	bool_config = {}
+	for boolean in bool_arg.split(","):
+		b = boolean.split(":")
+		if len(b) >= 2:
+			bool_config[b[0]] = (b[1] == "on")
+	#print("Bool config:\n", bool_config, "\n", bool_arg)
+	return bool_config
