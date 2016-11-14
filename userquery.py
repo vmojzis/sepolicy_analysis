@@ -163,6 +163,8 @@ class UserQuery:
 										    )
 		# get only rules corresponding to given package
 		for rule in all_rules:
+			if rule.source == rule.target: #remove self loops TODO - parametrise
+				continue
 			source = str(rule.source)
 			if data.is_attribute(rule.source):
 				if (source in package_attributes):
