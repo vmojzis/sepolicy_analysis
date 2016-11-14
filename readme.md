@@ -37,13 +37,11 @@ The tool makes it easy to compare query results between different policy version
 The tool could be used to evaluate feasibility of exploiting *common vulnerabilities and exposures* (CVE) on systems protected by SELinux. This could help pinpoint cases where SELinux can be used to prevent the attack and therefore expedite removal of the threat (temporary policy module can be shipped and applied significantly faster than new package version).
 
 ### Visualisation (work in progress)
-Understanding policy statements can be difficult because of the use of macros and attributes. Now it's possible to visualise policy section (given module or type) in a way that requires only basic understanding of mandatory access control (type enforcement). This feature is aimed at new policy writers and package maintainers who know what access permissions are necessary, but don't have deep understanding of SELinux. Visualisation of more complex policy modules can aid more skilled policy writers with bug fixing and module integration. 
+Understanding policy statements can be difficult because of the use of macros and attributes. Now it's possible to visualise policy section (given module) in a way that requires only basic understanding of mandatory access control (type enforcement). This feature is aimed at new policy writers and package maintainers who know what access permissions are necessary, but don't have deep understanding of SELinux. Visualisation of more complex policy modules can aid more skilled policy writers with bug fixing and module integration. 
 
-    Switch to "visualization" branch:
-    $git checkout visualization
     Generate "graphml" file containing policy concerning selected module:
     $./export_graph.py <policy_module> -fb
-    Open in [Gephi](https://gephi.org/) and change colours of nodes (attributes/types/types from selected package) and edges (attribute assignments/access vectors) based on their type. Edge labels contain permissions (or permission sets) concerning adjacent nodes.
+    Open in [Gephi](https://gephi.org/) and change colours of nodes (attributes/types/types from selected package) and edges (attribute assignments/access vectors) based on their type. Edge labels contain permissions (or permission sets) concerning adjacent nodes. More thorough tutorial will be added soon.
 
 ***
 

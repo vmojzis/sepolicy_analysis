@@ -70,6 +70,8 @@ Installation:
 Tools:
 	visual_query.py - generates graphs representing selected part of policy (single source/target)
 
+	export_graph.py - exports part of policy graph corresponding to given service (compatible with gephi)
+
 	build_graph.py - create policy graph as a base for analysis
 
 	graph_query.py - policy analysis tool
