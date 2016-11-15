@@ -38,10 +38,16 @@ The tool could be used to evaluate feasibility of exploiting *common vulnerabili
 
 ### Visualisation (work in progress)
 Understanding policy statements can be difficult because of the use of macros and attributes. Now it's possible to visualise policy section (given module) in a way that requires only basic understanding of mandatory access control (type enforcement). This feature is aimed at new policy writers and package maintainers who know what access permissions are necessary, but don't have deep understanding of SELinux. Visualisation of more complex policy modules can aid more skilled policy writers with bug fixing and module integration. 
+Generate "graphml" file containing policy concerning selected module:
 
-    Generate "graphml" file containing policy concerning selected module:
+    
     $./export_graph.py <policy_module> -fb
-    Open in [Gephi](https://gephi.org/) and change colours of nodes (attributes/types/types from selected package) and edges (attribute assignments/access vectors) based on their type. Edge labels contain permissions (or permission sets) concerning adjacent nodes. More thorough tutorial will be added soon.
+
+Open in [Gephi](https://gephi.org/). 
+(tested on Gephi 0.9.1)
+In "Layout" tab select "Force Atlas" from the drop down menu, set "Repulsion strength" to 2000 and run it.
+Use "Show node labels" button (black letter T on the bottom of the screen) and adjust their sizes using adjacent slider. Edge labels can be shown using adjacent button (white letter T).
+Edge labels contain permissions (or permission sets) concerning adjacent nodes. More thorough tutorial will be added soon.
 
 ***
 

@@ -85,14 +85,38 @@ def export_package(package, package_attributes ,rules):
 	G = nx.DiGraph()
 
 	#[(key[0],key[1],{key[2]:value}) for key,value in matrix.items()]
-	G.add_nodes_from([(n,{"weight":(2 if n in package_types else 1), "type":("attribute" if n in attribute_nodes else "selected" if n in package_types else "type")}) for n in nodes])
-	G.add_edges_from([(key[0],key[1],{"label":val}) for key,val in edge_labels.items()]) # nodes are added with keys - no unconnected edges
+	# Add special attributes for Gephi (color, type, ...)
+	nodes_gephi = []
+	for n in nodes:
+		nodetype = "type"
+		nodecolor = "cyan"#"skyblue turquoise"
+		if n in attribute_nodes:
+			nodetype = "attribute"
+			nodecolor = "darkorange"
+		elif n in package_types:
+			nodetype = "selected"
+			nodecolor = "green"
+		nodes_gephi.append((n,{"type":nodetype, "color":nodecolor}))
+
+#		nodecolor = (0,197,255)
+#		if n in attribute_nodes:
+#			nodetype = "attribute"
+#			nodecolor = (255,107,23)
+#		elif n in package_types:
+#			nodetype = "selected"
+#			nodecolor = (1,231,0)
+#		nodes_gephi.append((n,{"label":n,"type":nodetype, "r":nodecolor[0], "g":nodecolor[1], "b":nodecolor[2]}))
+
+
+
+	G.add_nodes_from(nodes_gephi)
+	G.add_edges_from([(key[0],key[1],{"label":val, "color":"cyan"}) for key,val in edge_labels.items()])
 	attribute_edges = set()	
 	for attr, val in attribute_edges_dict.items():
 		for t in val:
 			attribute_edges.add((attr, t))
 
-	G.add_edges_from([(v,u,{"type":"typeattr"}) for (u,v) in attribute_edges]) # nodes are added with keys - no unconnected edges
+	G.add_edges_from([(v,u,{"type":"typeattr", "color":"redorange"}) for (u,v) in attribute_edges])
 	
 	nx.write_graphml(G, str(package) + ".graphml")
 	
