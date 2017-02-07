@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
 # (C) Copyright 2016 Vit Mojzis, vmojzis@redhat.com
 # 
@@ -20,11 +20,11 @@
 import selinux
 import sepolicy  
 
-import os, sys, inspect
+#import os, sys, inspect
 # use this if you want to include modules from a subfolder
-cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"setools")))
-if cmd_subfolder not in sys.path:
-    sys.path.insert(0, cmd_subfolder)
+#cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"setools")))
+#if cmd_subfolder not in sys.path:
+#    sys.path.insert(0, cmd_subfolder)
 
 import setools
 #import setools.policyrep

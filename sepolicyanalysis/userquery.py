@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 # (C) Copyright 2016 Vit Mojzis, vmojzis@redhat.com
@@ -26,13 +26,13 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cmx
 import matplotlib.colors as colors
 from collections import defaultdict
-from edge_labels_optimizer import process_edge_labels, print_permission_sets
 
-import policy_data_collection as data
-import config_loading as config
-import visualization as vis
-import domain_grouping as grouping
-import gephi_export as export
+from sepolicyanalysis.edge_labels_optimizer import process_edge_labels, print_permission_sets
+import sepolicyanalysis.policy_data_collection as data
+import sepolicyanalysis.config_loading as config
+import sepolicyanalysis.visualization as vis
+import sepolicyanalysis.domain_grouping as grouping
+import sepolicyanalysis.gephi_export as export
 import math
 import sys
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
 # (C) Copyright 2016 Vit Mojzis, vmojzis@redhat.com
 # 
@@ -26,8 +26,8 @@ import sepolicy
 import bisect
 import sys
 import copy
-import policy_data_collection as data
-import policy_parser as pparse
+import sepolicyanalysis.policy_data_collection as data
+import sepolicyanalysis.policy_parser as pparse
 
 #Represents group of selinux types defined in the same package
 #domains - set of types with attrinbute "domain"
@@ -246,7 +246,7 @@ def parse_cil_files(path):
 # and return them as ditionary {group_name:DomainGroup()}
 def group_types_cil(): 
 	try:
-		txt = open("domain_groups_cil.conf", "r")
+		txt = open("/etc/sepolicyanalysis/domain_groups_cil.conf", "r")
 
 		domain_groups = {}
 		for line in txt:
@@ -262,6 +262,7 @@ def group_types_cil():
 		return domain_groups
 
 	except IOError as e:
+		print(e,file=sys.stderr)
 		return {}
 
 #get types from given groups 

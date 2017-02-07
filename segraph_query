@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
 # (C) Copyright 2016 Vit Mojzis, vmojzis@redhat.com
 # 
@@ -24,11 +24,12 @@ import pickle
 import networkx as nx
 import sys
 
-import policy_data_collection as data
-import evaluation_functions as evaluation
-import graph_query_functions as functions
+import sepolicyanalysis.policy_data_collection as data
+import sepolicyanalysis.evaluation_functions as evaluation
+import sepolicyanalysis.graph_query_functions as functions
+import sepolicyanalysis.domain_grouping as grouping
+
 import argparse
-import domain_grouping as grouping
 from collections import defaultdict
 
 def is_iterable(obj):

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
 # (C) Copyright 2016 Vit Mojzis, vmojzis@redhat.com
 # 
@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import domain_grouping as grouping
+import sepolicyanalysis.domain_grouping as grouping
 import sys
 
 # read "security_related.conf" and return corresponding types
@@ -28,7 +28,7 @@ def get_security_types():
 		types = set()
 		exclude = set()
 		
-		txt = open("security_related.conf", "r")
+		txt = open("/etc/sepolicyanalysis/security_related.conf", "r")
 		packages = {}
 		for line in txt:
 			if (len(line) < 1) or (line[0] == '#'):

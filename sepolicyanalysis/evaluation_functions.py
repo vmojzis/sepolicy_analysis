@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
 # (C) Copyright 2016 Vit Mojzis, vmojzis@redhat.com
 # 
@@ -23,7 +23,7 @@ import sepolicy
 import networkx as nx
 
 from collections import defaultdict
-from security_related import get_security_types
+from sepolicyanalysis.security_related import get_security_types
 
 # find viable type transitions (entrypoint to target_domain and executable by source_domain exists)
 # returns set of tuples (source_domain, target_domain, entrypoint)

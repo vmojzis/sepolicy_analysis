@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 # (C) Copyright 2016 Vit Mojzis, vmojzis@redhat.com

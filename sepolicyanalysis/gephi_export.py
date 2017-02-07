@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 # (C) Copyright 2016 Vit Mojzis, vmojzis@redhat.com
@@ -19,8 +19,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import networkx as nx
-import matplotlib.pyplot as plt
-
 import selinux
 import sepolicy   
 import random
@@ -29,10 +27,11 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cmx
 import matplotlib.colors as colors
 from collections import defaultdict
-from edge_labels_optimizer import process_edge_labels, print_permission_sets
 
-import policy_data_collection as data
-import config_loading as config
+from sepolicyanalysis.edge_labels_optimizer import process_edge_labels, print_permission_sets
+import sepolicyanalysis.policy_data_collection as data
+import sepolicyanalysis.config_loading as config
+
 import math
 
 

@@ -11,8 +11,8 @@ set -e
 TOOL_FOLDER=$(pwd)
 FOLDER="__extracted"
 
-mkdir cil
-cd cil
+mkdir /tmp/cil
+cd /tmp/cil
 cp -R /var/lib/selinux/targeted/active/modules/100/* .
 
 mkdir $FOLDER
@@ -29,6 +29,6 @@ CIL_FILES=$(pwd)
 
 cd $TOOL_FOLDER
 
-python3 -c "import domain_grouping; domain_grouping.parse_cil_files('$CIL_FILES/$FOLDER')" > domain_groups_cil.conf
+python3 -c "import sepolicyanalysis.domain_grouping; domain_grouping.parse_cil_files('$CIL_FILES/$FOLDER')" > /etc/sepolicyanalysis/domain_groups_cil.conf
 
 rm -rf $CIL_FILES

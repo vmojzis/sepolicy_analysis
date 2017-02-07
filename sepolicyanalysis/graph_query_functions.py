@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
 # (C) Copyright 2016 Vit Mojzis, vmojzis@redhat.com
 # 
@@ -23,8 +23,8 @@ import sepolicy
 import networkx as nx
 
 from collections import defaultdict
-import evaluation_functions as graph
-from security_related import get_security_types
+import sepolicyanalysis.evaluation_functions as graph
+from sepolicyanalysis.security_related import get_security_types
 
 
 ''' 
