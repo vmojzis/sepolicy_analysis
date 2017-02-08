@@ -21,27 +21,29 @@ Permission pathways (given combinations of permissions between multiple SELinux 
 
 
     Build graph file derived from SELinux policy (active policy is used by default):
-    $ ./build_graph.py -fb -c file,process output/graph
+    $ sebuild_graph -fb -c file,process policy_snapshot
     Search for potential security issues (query function names and descriptions can be found in graph_query_functions.py):
-    $ ./graph_query.py output/graph transition_write
+    $ segraph_query policy_snapshot transition_write
 
 ### Regression testing
 The tool makes it easy to compare query results between different policy versions. This feature ensures that recent changes (bug fixing, new policy modules, etc.) aren't decreasing security of the policy. Compared to "sediff", only relevant results are shown (potential security issues) and the process is more resource effective (especially memory usage).
 
     Build second graph file based on different policy version:
-    $ ./build_graph.py -fb -c file,process output/graph2 -p policy_data/policy.30
-    Search for newly introduced issues (first graph is used as a baseline):
-    $ ./graph_query.py output/graph2 -d output/graph transition_write
+    $ sebuild_graph -fb -c file,process policy_snapshot2 -p policy_data/policy.30
+    Search for newly introduced issues (first snapshot is used as a baseline):
+    $ segraph_query policy_snapshot2 -d policy_snapshot transition_write
 
-### CVE evaluation (work in progress)
+### ~~CVE evaluation~~ (cancelled)
 The tool could be used to evaluate feasibility of exploiting *common vulnerabilities and exposures* (CVE) on systems protected by SELinux. This could help pinpoint cases where SELinux can be used to prevent the attack and therefore expedite removal of the threat (temporary policy module can be shipped and applied significantly faster than new package version).
 
 ### Visualisation (work in progress)
 Understanding policy statements can be difficult because of the use of macros and attributes. Now it's possible to visualise policy section (given module) in a way that requires only basic understanding of mandatory access control (type enforcement). This feature is aimed at new policy writers and package maintainers who know what access permissions are necessary, but don't have deep understanding of SELinux. Visualisation of more complex policy modules can aid more skilled policy writers with bug fixing and module integration. 
 Generate "graphml" file containing policy concerning selected module:
-
     
-    $./export_graph.py <policy_module> -fb
+    $seexport_graph <policy_module> -fb
+e.g.
+
+    $seexport_graph keyboardd -fb
 
 Open in [Gephi](https://gephi.org/). 
 (tested on Gephi 0.9.1)
