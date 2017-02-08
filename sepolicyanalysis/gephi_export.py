@@ -42,8 +42,6 @@ def export_package(package, package_attributes ,rules):
 	edge_labels = defaultdict(list) #edges with permissions
 	attribute_edges_dict = defaultdict(list) #special edges connecting attributes and corresponding types
 
-	nodes = set()
-
 	package_types = set(package.types)
 		
 	attribute_nodes = set() # should be assigned special attribute so that gephi recognises them
@@ -75,18 +73,25 @@ def export_package(package, package_attributes ,rules):
 		for s in sources:
 			for t in targets:
 				edge_labels[(s, t)].extend([str(x) for x in rule.perms])
-				nodes.add(s)
-				nodes.add(t)
-
 
 	process_edge_labels(edge_labels)
 
 	G = nx.DiGraph()
 
-	#[(key[0],key[1],{key[2]:value}) for key,value in matrix.items()]
 	# Add special attributes for Gephi (color, type, ...)
+
+	G.add_edges_from([(key[0],key[1],{"label":val, "color":"cyan"}) for key,val in edge_labels.items()])
+
+	attribute_edges = set()	
+	for attr, val in attribute_edges_dict.items():
+		for t in val:
+			attribute_edges.add((attr, t))
+
+	G.add_edges_from([(v,u,{"type":"typeattr", "color":"redorange"}) for (u,v) in attribute_edges])
+
+	#assign color to each node (attribute vs type from selected package vs other type)
 	nodes_gephi = []
-	for n in nodes:
+	for n in G.nodes():
 		nodetype = "type"
 		nodecolor = "cyan"#"skyblue turquoise"
 		if n in attribute_nodes:
@@ -106,16 +111,8 @@ def export_package(package, package_attributes ,rules):
 #			nodecolor = (1,231,0)
 #		nodes_gephi.append((n,{"label":n,"type":nodetype, "r":nodecolor[0], "g":nodecolor[1], "b":nodecolor[2]}))
 
-
-
 	G.add_nodes_from(nodes_gephi)
-	G.add_edges_from([(key[0],key[1],{"label":val, "color":"cyan"}) for key,val in edge_labels.items()])
-	attribute_edges = set()	
-	for attr, val in attribute_edges_dict.items():
-		for t in val:
-			attribute_edges.add((attr, t))
 
-	G.add_edges_from([(v,u,{"type":"typeattr", "color":"redorange"}) for (u,v) in attribute_edges])
-	
+	#TODO: allow user to specify output file name
 	nx.write_graphml(G, str(package) + ".graphml")
 	
