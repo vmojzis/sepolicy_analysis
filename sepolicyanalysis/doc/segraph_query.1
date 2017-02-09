@@ -1,0 +1,81 @@
+.\" Copyright (c) 2016 Vit Mojzis, vmojzis@redhat.com
+.TH segraph_query 1 2017-02-09 "" "SELinux Policy Analysis Tool"
+.SH NAME
+\fBsegraph_query \fP- SELinux policy analysis tool
+.SH SYNOPSIS
+.nf
+.fam C
+\fBsegraph_query\fP [\fB-h\fP] [\fB-d\fP \fIPOLICY_GRAPH2\fP] \fIPOLICY_GRAPH\fP \fIQUERY_FUNCTIONS\fP
+
+.fam T
+.fi
+.fam T
+.fi
+.SH DESCRIPTION
+Analyses policy graph using given query functions.
+.RE
+.TP
+.B
+.SS Available query functions:
+.RS
+.TP
+.B
+write_executable
+Finds all types corresponding to executables, that can be written to. Lists dictionary with execuatable types as keys and types with write permission as values.
+.TP
+.B
+transition_write
+Finds domain transitions via entrypoints that can be rewritten by source domain. This effectively increases reach of source domain by access rights of target domain. Lists triplets of (source domain, target domain, entrypoint)
+.TP
+.B
+write_to_security
+Find domains that are allowed write access to "security related" types. Lists domains with the specified write access and lists of affected types (security types that can be written to)
+.RE
+.PP
+
+.SH OPTIONS
+
+.SS Positional arguments:
+.RS
+.TP
+.B
+\fIPOLICY_GRAPH\fP
+Policy graph file
+.TP
+.B
+\fIQUERY_FUNCTIONS\fP
+Comma separated list of query functions to be executed
+.RE
+.PP
+.SS Optional arguments:
+.RS
+.TP
+.B
+\fB-h\fP, \fB--help\fP
+Show help message and exit
+.TP
+.B
+\fB-d\fP \fIPOLICY_GRAPH2\fP, \fB--diff\fP \fIPOLICY_GRAPH2\fP
+Another policy graph file for comparison
+.SH EXAMPLE
+Check a policy graph (created using sebuild_graph) with write_executable function:
+.PP
+.nf
+.fam C
+      $ graph_query.py graph write_executable
+
+.fam T
+.fi
+Show consequences of change in policy (graph2 was created after the change):
+.PP
+.nf
+.fam C
+      $ segraph_query graph2 write_executable,transition_write,write_to_security -d graph
+
+
+.fam T
+.fi
+.SH SEE ALSO
+\fBsebuild_graph\fP(1)
+.SH AUTHOR
+Vit Mojzis <vmojzis@redhat.com>

@@ -1,0 +1,19 @@
+.\" Copyright (c) 2016 Vit Mojzis, vmojzis@redhat.com
+.TH seextract_cil 1 2017-02-09 "" "SELinux Policy Analysis Tool"
+.SH NAME
+\fBseextract_cil \fP- SELinux policy graph export tool
+.SH SYNOPSIS
+.nf
+.fam C
+\fBseextract_cil\fP
+
+.fam T
+.fi
+.fam T
+.fi
+.SH DESCRIPTION
+Extracts type names from policy packages installed in the system and saves them in domain_groups_cil.conf. This gives the analysis tool information about types (which package does a type belong to and is it process or resource type).
+.SH SEE ALSO
+\fBsebuild_graph\fP(1), \fBseexport_graph\fP(1), \fBsegraph_query\fP(1), \fBsevisual_query\fP(1)
+.SH AUTHOR
+Vit Mojzis <vmojzis@redhat.com>

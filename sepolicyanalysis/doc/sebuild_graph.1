@@ -1,0 +1,68 @@
+.\" Copyright (c) 2016 Vit Mojzis, vmojzis@redhat.com
+.TH sebuild_graph 1 2017-02-09 "" "SELinux Policy Analysis Tool"
+.SH NAME
+\fBsebuild_graph \fP- SELinux policy visualization tool graph builder
+.SH SYNOPSIS
+.nf
+.fam C
+\fBsebuild_graph\fP [\fB-h\fP] [\fB-dg\fP] [\fB-fb\fP [\fIFILTER_BOOLS\fP]] [\fB-c\fP \fICLASSES\fP]
+                   [\fB-p\fP [\fIPOLICY\fP]] \fIFILENAME\fP
+
+.fam T
+.fi
+.fam T
+.fi
+.SH DESCRIPTION
+Creates a snapshot of given SELinux policy (if no policy file is provided, policy loaded in the system is be used) that can be analyzed using segraph_query.
+.SH OPTIONS
+
+.SS Positional arguments:
+.RS
+.TP
+.B
+\fIFILENAME\fP
+Name for the new policy graph file.
+.RE
+.PP
+.SS Optional arguments:
+.RS
+.TP
+.B
+\fB-h\fP, \fB--help\fP
+show this help message and exit
+.TP
+.B
+\fB-dg\fP, \fB--domain_grouping\fP
+Group SELinux domains based on package they belong to.
+Use with caution, generates false positives!
+.TP
+.B
+\fB-fb\fP [\fIFILTER_BOOLS\fP], \fB--filter_bools\fP [\fIFILTER_BOOLS\fP]
+Filter rules based on current boolean setting or comma separated list of [boolean]:[on/off].
+.TP
+.B
+\fB-c\fP \fICLASSES\fP, \fB--class\fP \fICLASSES\fP
+Comma separated list of object classes to be present
+in the graph. All classes assumed if omitted.
+.TP
+.B
+\fB-p\fP [\fIPOLICY\fP], \fB--policy\fP [\fIPOLICY\fP]
+Path to the SELinux policy to be used.
+.RE
+.RE
+.PP
+
+.SH EXAMPLE
+Create snapshot of SELinux policy loaded in the system (only rules concerning files and processes are considered, boolean setting is taken into account):
+.PP
+.nf
+.fam C
+      $ sebuild_graph.py -fb -c file,process graph
+
+
+.fam T
+.fi
+.SH SEE ALSO
+\fBsegraph_query\fP(1)
+.SH AUTHOR
+Vit Mojzis <vmojzis@redhat.com>

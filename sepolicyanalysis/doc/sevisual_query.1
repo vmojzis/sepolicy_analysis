@@ -1,0 +1,122 @@
+.\" Copyright (c) 2016 Vit Mojzis, vmojzis@redhat.com
+.TH sevisual_query 1 2017-02-09 "" "SELinux Policy Analysis Tool"
+.SH NAME
+\fBsevisual_query \fP- SELinux policy visual query
+.SH SYNOPSIS
+.nf
+.fam C
+\fBsevisual_query\fP [\fB-h\fP] [\fB-s\fP \fISOURCE\fP | \fB-t\fP \fITARGET\fP]
+                    [\fB-sg\fP \fISOURCE_GROUP\fP | \fB-tg\fP \fITARGET_GROUP\fP] [\fB-c\fP \fITCLASS\fP]
+                    [\fB-p\fP \fIPERMS\fP] [\fB-a\fP \fIATTR\fP] [\fB-b\fP \fIBOOL\fP] [\fB-ea\fP] [\fB-dg\fP]
+                    [\fB-fb\fP [\fIFILTER_BOOLS\fP]] [\fB-fa\fP \fIATTR\fP] [\fB-sm\fP \fISIZE_MULTIPLIER\fP]
+                    [\fIpolicy\fP]
+
+.fam T
+.fi
+.fam T
+.fi
+.SH DESCRIPTION
+Creates visual representation (pdf containing vector graphics) of part of given SELinux policy (concerning selected type). Rules assigned via attributes are distinguished by color codes. Dashed lines represent conditional rules. 
+.SH OPTIONS
+
+.SS Positional arguments:
+.RS
+.TP
+.B
+\fIpolicy\fP
+Path to the SELinux policy to be used.
+.RE
+.PP
+.SS Optional arguments:
+.RS
+.TP
+.B
+\fB-h\fP, \fB--help\fP
+show this help message and exit
+.TP
+.B
+\fB-sm\fP \fISIZE_MULTIPLIER\fP, \fB--size_multiplier\fP \fISIZE_MULTIPLIER\fP
+Graph canvas size multiplier (>1 increases space
+between nodes)
+.RE
+.PP
+.SS Rule search (similar to sesearch):
+.RS
+.TP
+.B
+\fB-s\fP \fISOURCE\fP, \fB--source\fP \fISOURCE\fP
+Source type of the TE rule.
+.TP
+.B
+\fB-t\fP \fITARGET\fP, \fB--target\fP \fITARGET\fP
+Target type of the TE rule.
+.TP
+.B
+\fB-sg\fP \fISOURCE_GROUP\fP, \fB--source_group\fP \fISOURCE_GROUP\fP
+Source type (consider whole domain group containing
+the type) of the TE rule.
+.TP
+.B
+\fB-tg\fP \fITARGET_GROUP\fP, \fB--target_group\fP \fITARGET_GROUP\fP
+Target type (consider whole domain group containing
+the type) of the TE rule.
+.TP
+.B
+\fB-c\fP \fITCLASS\fP, \fB--class\fP \fITCLASS\fP
+Comma separated list of object classes
+.TP
+.B
+\fB-p\fP \fIPERMS\fP, \fB--perms\fP \fIPERMS\fP
+Comma separated list of permissions.
+.TP
+.B
+\fB-a\fP \fIATTR\fP, \fB--attr\fP \fIATTR\fP
+Comma separated list of attributes.
+.TP
+.B
+\fB-b\fP \fIBOOL\fP, \fB--bool\fP \fIBOOL\fP
+Comma separated list of Booleans in the conditional
+expression.
+.TP
+.B
+\fB-ea\fP
+Expand rules ending in attribute (to all types that
+have given attribute).
+.RE
+.PP
+.SS Filtering:
+.RS
+.TP
+.B
+\fB-dg\fP
+Group SELinux domains based on package they belong to.
+.TP
+.B
+\fB-fb\fP [\fIFILTER_BOOLS\fP], \fB--filter_bools\fP [\fIFILTER_BOOLS\fP]
+Filter rules based on current boolean setting or comma separated list of [boolean]:[on/off]
+.TP
+.B
+\fB-fa\fP \fIATTR\fP, \fB--filter_attrs\fP \fIATTR\fP
+Filter out rules allowed for specified attributes.
+\fIATTR\fP is comma separated list of attributes.
+.RE
+.RE
+.PP
+
+
+.SH EXAMPLE
+Show policy concerning bluetooth_t type (only access to files, other types are grouped into packages):
+.PP
+.nf
+.fam C
+      $ sevisual_query -s bluetooth_t -c file -dg
+      $ okular graph.pdf
+
+.fam T
+.fi
+.SH SEE ALSO
+\fBseextract_cil\fP(1), \fBseexport_graph\fP(1)
+.SH HINTS
+Have a look at seexport_graph which can work with whole policy package and the resulting visualization is interactive.
+.SH AUTHOR
+Vit Mojzis <vmojzis@redhat.com>

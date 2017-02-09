@@ -1,0 +1,91 @@
+.\" Copyright (c) 2016 Vit Mojzis, vmojzis@redhat.com
+.TH seexport_graph 1 2017-02-09 "" "SELinux Policy Analysis Tool"
+.SH NAME
+\fBseexport_graph \fP- SELinux policy graph export tool
+.SH SYNOPSIS
+.nf
+.fam C
+\fBseexport_graph\fP [\fB-h\fP] [\fB-c\fP \fITCLASS\fP] [\fB-p\fP \fIPERMS\fP] [\fB-a\fP \fIATTR\fP] [\fB-b\fP \fIBOOL\fP] [\fB-ea\fP]
+               [\fB-fb\fP [\fIFILTER_BOOLS\fP]] [\fB-fa\fP \fIATTR\fP]
+               \fBpackage\fP [\fIpolicy\fP]
+
+.fam T
+.fi
+.fam T
+.fi
+.SH DESCRIPTION
+Exports part of given SELinux \fIpolicy\fP (concerning selected \fIpackage\fP) to a graphml file. This file can than be visualized (e.g. using Gephi - gephi.org)
+.SH OPTIONS
+
+.SS Positional arguments
+.RS
+.TP
+.B
+\fIpackage\fP
+Policy concerning this package will be exported
+.TP
+.B
+\fIpolicy\fP
+Path to the SELinux \fIpolicy\fP to be used.
+.RE
+.PP
+.SS Optional arguments
+.RS
+.TP
+.B
+\fB-h\fP, \fB--help\fP
+show this help message and exit
+.RE
+.PP
+.SS Rule search (similar to sesearch)
+.RS
+.TP
+.B
+\fB-c\fP \fITCLASS\fP, \fB--class\fP \fITCLASS\fP
+Comma separated list of object classes
+.TP
+.B
+\fB-p\fP \fIPERMS\fP, \fB--perms\fP \fIPERMS\fP
+Comma separated list of permissions.
+.TP
+.B
+\fB-a\fP \fIATTR\fP, \fB--attr\fP \fIATTR\fP
+Comma separated list of attributes.
+.TP
+.B
+\fB-b\fP \fIBOOL\fP, \fB--bool\fP \fIBOOL\fP
+Comma separated list of Booleans in the conditional
+expression.
+.TP
+.B
+\fB-ea\fP
+Expand rules ending in attribute (to all types that
+have given attribute)
+.RE
+.PP
+.SS Filtering
+.RS
+.TP
+.B
+\fB-fb\fP [\fIFILTER_BOOLS\fP], \fB--filter_bools\fP [\fIFILTER_BOOLS\fP]
+Filter rules based on current boolean setting or 
+comma separated list of
+[boolean]:[on/off]
+.TP
+.B
+\fB-fa\fP \fIATTR\fP, \fB--filter_attrs\fP \fIATTR\fP
+Filter out rules allowed for specified attributes. \fIATTR\fP is comma separated list of attributes.
+.SH EXAMPLE
+Export policy concerning bluetooth daemon (only access to files, boolean settings is taken into account):
+.PP
+.nf
+.fam C
+      $ seexport_graph bluetooth -fb -c file,process
+.fam T
+.fi
+.SH SEE ALSO
+\fBseextract_cil\fP(1)
+.SH BUGS
+domain_groups_cil.conf has to be kept up to date using seextract_cil command. Only packages present there can be exported.
+.SH AUTHOR
+Vit Mojzis <vmojzis@redhat.com>
