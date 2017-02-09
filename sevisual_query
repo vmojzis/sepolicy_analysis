@@ -30,7 +30,7 @@ parser = argparse.ArgumentParser(description='SELinux policy visual query tool.'
 
 parser.add_argument("policy", help="Path to the SELinux policy to be used.", nargs="?")
 
-search = parser.add_argument_group("Rule search (simillar to sesearch)")
+search = parser.add_argument_group("Rule search (similar to sesearch)")
 
 source_target = search.add_mutually_exclusive_group()
 

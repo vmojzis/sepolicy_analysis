@@ -32,7 +32,7 @@ parser.add_argument("package", help="Policy concerning this package will be expo
 
 parser.add_argument("policy", help="Path to the SELinux policy to be used.", nargs="?")
 
-search = parser.add_argument_group("Rule search (simillar to sesearch)")
+search = parser.add_argument_group("Rule search (similar to sesearch)")
 
 search.add_argument("-c", "--class", dest="tclass",
                   help="Comma separated list of object classes")

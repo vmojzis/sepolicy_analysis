@@ -1,4 +1,4 @@
-#!/bin/bash -vx
+#!/bin/bash
 
 if [ "$(id -u)" != "0" ]; then
    echo "This script must be run as root" 1>&2
@@ -11,11 +11,11 @@ set -e
 TOOL_FOLDER=$(pwd)
 FOLDER="__extracted"
 
-mkdir /tmp/cil
+mkdir -p /tmp/cil
 cd /tmp/cil
 cp -R /var/lib/selinux/targeted/active/modules/100/* .
 
-mkdir $FOLDER
+mkdir -p $FOLDER
 
 for i in $( ls ) 
 do
@@ -29,6 +29,8 @@ CIL_FILES=$(pwd)
 
 cd $TOOL_FOLDER
 
-python3 -c "import sepolicyanalysis.domain_grouping; domain_grouping.parse_cil_files('$CIL_FILES/$FOLDER')" > /etc/sepolicyanalysis/domain_groups_cil.conf
+python3 -c "import sepolicyanalysis.domain_grouping as grouping; grouping.parse_cil_files('$CIL_FILES/$FOLDER')" > /etc/sepolicyanalysis/domain_groups_cil.conf
 
 rm -rf $CIL_FILES
+
+echo "domain_groups_cil.conf has been updated."

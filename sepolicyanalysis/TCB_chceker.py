@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 # (C) Copyright 2016 Vit Mojzis, vmojzis@redhat.com
 # 
 # This program is distributed under the terms of the GNU General Public License

@@ -49,7 +49,7 @@ parser.add_argument("-fb", "--filter_bools", nargs="?", dest="filter_bools", con
 
 parser.add_argument("-c", "--class", dest="classes",
                   help="Comma separated list of object classes to be present \
-                  		in the graph. All classes assumed if ommited.")
+                  		in the graph. All classes assumed if omitted.")
 
 parser.add_argument("-p", "--policy", dest="policy", help="Path to the SELinux policy to be used.", nargs="?")
 
