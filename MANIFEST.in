@@ -1,2 +1,3 @@
 include sepolicyanalysis/doc/*.1*
 include sepolicyanalysis/*.conf
+include COPYING

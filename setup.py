@@ -2,6 +2,8 @@
 
 import os
 from setuptools import setup, find_packages
+import distutils.command.install_data
+import re
 
 # Utility function to read the README file.
 # Used for the long_description.  It's nice, because now 1) we have a top level
@@ -10,12 +12,24 @@ from setuptools import setup, find_packages
 def read(fname):
     return open(fname).read()
 
+#custom install_data to fix man page extensions (to fit Fedora)
+#based on https://bugs.python.org/issue644744
+class MyInstallData (distutils.command.install_data.install_data):
+    """My own data installer to handle .man pages"""
+    def copy_file (self, filename, dirname):
+        (out, _) = distutils.command.install_data.install_data.copy_file(self, filename, dirname)
+        # match for man pages
+        if re.search(r'/man/man\d/.+\.\d$', out):
+            return (out+".*", _)
+        return (out, _)
+
 setup(
+    cmdclass = { 'install_data': MyInstallData },
     name="SEPolicyAnalysis",
     version="0.1",
     packages=find_packages(exclude=["setools", "policy_data", "demo", "examples", "data"]),
     scripts=['seextract_cil', 'sebuild_graph', 'seexport_graph', 'segraph_query', 'sevisual_query'], #, 'export_graph.py', 'build_graph.py', 'visual_query.py', 'graph_query.py'
-    #keep config files
+    #replaced by MANIFEST.in
     package_data={
     # If any package contains *.conf files, include them:
         #'': ['*.conf', 'sepolicyanalysis/doc/*.1'],
