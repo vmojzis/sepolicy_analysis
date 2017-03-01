@@ -1,4 +1,4 @@
-Name:           SEPolicyAnalysis
+Name:           sepolicy_analysis
 Version:        0.1
 Release:        1%{?dist}
 Summary:        SELinux policy analysis tool
@@ -43,6 +43,7 @@ providing policy visualization.
 %{_bindir}/seexport_graph
 %{_bindir}/segraph_query
 %{_bindir}/sevisual_query
+%dir %{_sysconfdir}/sepolicyanalysis
 %config(noreplace) %{_sysconfdir}/sepolicyanalysis/domain_groups_cil.conf
 %config(noreplace) %{_sysconfdir}/sepolicyanalysis/security_related.conf
 %doc %{_mandir}/man1/se*

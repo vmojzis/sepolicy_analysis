@@ -1,5 +1,22 @@
 #!/usr/bin/env python3
 
+# (C) Copyright 2016 Vit Mojzis, vmojzis@redhat.com
+# 
+# This program is distributed under the terms of the GNU General Public License
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import os
 from setuptools import setup, find_packages
 import distutils.command.install_data
@@ -25,7 +42,7 @@ class MyInstallData (distutils.command.install_data.install_data):
 
 setup(
     cmdclass = { 'install_data': MyInstallData },
-    name="SEPolicyAnalysis",
+    name="sepolicy_analysis",
     version="0.1",
     packages=find_packages(exclude=["setools", "policy_data", "demo", "examples", "data"]),
     scripts=['seextract_cil', 'sebuild_graph', 'seexport_graph', 'segraph_query', 'sevisual_query'], #, 'export_graph.py', 'build_graph.py', 'visual_query.py', 'graph_query.py'
