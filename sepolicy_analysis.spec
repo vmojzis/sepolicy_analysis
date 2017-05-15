@@ -1,10 +1,11 @@
 Name:           sepolicy_analysis
 Version:        0.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        SELinux policy analysis tool
 
 License:        GPLv3
 URL:            https://github.com/vmojzis/sepolicy_analysis
+#./setup.py egg_info --egg-base /tmp sdist
 Source0:        https://github.com/vmojzis/sepolicy_analysis/releases/download/%{version}/%{name}-%{version}.tar.gz
 
 BuildArch:      noarch
@@ -12,6 +13,7 @@ BuildArch:      noarch
 BuildRequires:  python3-devel
 
 Requires: setools-python3 >= 4.0
+Requires: python3-networkx >= 1.11
 
 %description
 Tool designed to help increase the quality of SELinux policy by identifying
@@ -20,8 +22,6 @@ providing policy visualization.
 
 %prep
 %autosetup
-# Github prepends repository name to source folder name when aouto-creating source package
-# % autosetup -n sepolicy_analysis-% {name}-% {version}
 
 %build
 %py3_build
@@ -49,6 +49,9 @@ providing policy visualization.
 %doc %{_mandir}/man1/se*
 
 %changelog
+* Mon May 15 2017 Vit Mojzis <vmojzis@redhat.com> - 0.1-1
+- Add dependency on python3-networkx
+
 * Wed Feb 08 2017 Vit Mojzis <vmojzis@redhat.com> - 0.1-1
 - Initial release
 

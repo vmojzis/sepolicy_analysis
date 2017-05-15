@@ -60,7 +60,7 @@ setup(
     #exclude_package_data={'': ['readme.md']},
     author="Vit Mojzis",
     author_email="vmojzis@redhat.com",
-    description="Tool designed to help increase the quality of SELinux policy",
+    description="SELinux policy analysis tool",
     #long_description=read('readme'),
     #long_description="Tool designed to help increase the quality of SELinux \
     #                  policy by identifying possibly dangerous permission \
