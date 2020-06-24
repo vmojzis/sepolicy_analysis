@@ -51,32 +51,10 @@ def half_expand_rule(rule, expand_source):
 	expansion = rule.source.expand() if expand_source else rule.target.expand()
 	if expand_source:
 		for t in expansion:
-			results.append(setools.policyrep.terule.expanded_te_rule_factory(rule, t, rule.target))
+			results.append(rule.derive_expanded(t, rule.target, rule.perms))
 	else:
 		for t in expansion:
-			results.append(setools.policyrep.terule.expanded_te_rule_factory(rule, rule.source, t))
-	return results
-
-# return set of rules where attributes were replaced by all types with given attribute
-def expand_rule(rule):
-	results = []
-
-	source_exp = rule.source.expand() if is_attribute(rule.source) else [rule.source]
-	target_exp = rule.target.expand() if is_attribute(rule.target) else [rule.target]
-
-	for source in source_exp:
-		for target in target_exp:
-			if isinstance(rule, setools.policyrep.terule.ExpandedTERule):
-				#expanded_te_rule_factory ignores ExpandedTERules (doesn't set new source/target)
-				newrule = setools.policyrep.terule.ExpandedTERule(rule.policy, rule.qpol_symbol)
-				newrule.source = source
-				newrule.target = target
-				nwerule.origin = rule.origin
-
-			else:	
-				newrule = setools.policyrep.terule.expanded_te_rule_factory(rule, source, target)
-			results.append(newrule)
-
+			results.append(rule.derive_expanded(rule.source, t, rule.perms))
 	return results
 
 # expand all rules in given iterable
@@ -90,7 +68,7 @@ def expand_rules(rules):
 			# discard rules corresponding to unconfined attributes 
 			# TODO: add command line argument that switches this off - i.e. consider unconfined attributes
 			if (not is_unconfined_attr(rule.source)) and (not is_unconfined_attr(rule.target)): 
-				results.extend(expand_rule(rule))
+				results.extend(rule.expand())
 
 	return results
 
@@ -223,7 +201,7 @@ def filter_terules_boolean(rules, bool_state = None):
 				# return rules in agreement with boolean settings
 				results.append(rule)
 
-		except setools.policyrep.exception.RuleNotConditional:
+		except setools.exception.RuleNotConditional:
 			# return all unconditional rules
 			results.append(rule)
 
@@ -256,12 +234,12 @@ def is_conditional(rule):
 			boolean = str(rule.conditional)
 		return boolean
 
-	except setools.policyrep.exception.RuleNotConditional:
+	except setools.exception.RuleNotConditional:
 		False
 
 # is given object of type "TypeAttribute" ?
 def is_attribute(obj):
-	return isinstance(obj, setools.policyrep.typeattr.TypeAttribute)
+	return isinstance(obj, setools.policyrep.TypeAttribute)
 
 # is given object of type "TypeAttribute" which is considered unconfined ?
 # TODO: refine -- limit to "strong" unconfined domains (associated with lots of privileges)
