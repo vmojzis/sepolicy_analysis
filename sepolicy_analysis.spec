@@ -12,8 +12,9 @@ BuildArch:      noarch
 
 BuildRequires:  python3-devel
 
-Requires: setools-python3 >= 4.0
+Requires: python3-setools >= 4.0
 Requires: python3-networkx >= 1.11
+Requires: python3-matplotlib
 
 %description
 Tool designed to help increase the quality of SELinux policy by identifying
